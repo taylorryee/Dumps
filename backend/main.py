@@ -1,7 +1,7 @@
 # main.py
 from fastapi import FastAPI, Depends
-from db import SessionLocal
-
+from backend.db import SessionLocal
+from backend.routes.dumpRoutes import router as dumpRouter
 app = FastAPI()
 
 def get_db():
@@ -18,3 +18,5 @@ def health():
 @app.get("/test-db")
 def test_db(db = Depends(get_db)):
     return {"message": "DB connected!"}
+
+app.include_router(dumpRouter)
