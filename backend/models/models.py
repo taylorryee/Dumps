@@ -17,7 +17,8 @@ class Dump(Base): #intial thought dump
 class Thought(Base):#indivual thoughts extracted from dump
     __tablename__ = "thoughts"
     id = Column(Integer,primary_key=True,index=True)
-    text = Column(String,index=True)
+    cleaned_text = Column(String,index=True)
+    raw_text = Column(String,index=True)
     embedding = Column(Vector(1536))
     
     dump_id = Column(Integer,ForeignKey("dumps.id"))
