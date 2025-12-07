@@ -1,9 +1,14 @@
 from fastapi import APIRouter,Depends,HTTPException
 from sqlalchemy.orm import Session
+from datetime import date
+from typing import List
 
-from backend.db import get_db
-from backend.schemas.dumpSchema import dumpCreate,dumpReturn
-from backend.services import dumpServices as service
+from app.db import get_db
+from app.schemas.dumpSchema import dumpCreate,dumpReturn
+from app.services import dumpServices as service
+from app.celery_app import celery_app
+
+
 
 router = APIRouter(prefix = "/dump",tags=["Dump Routes"])
 
@@ -15,5 +20,18 @@ def create_dump_route(new_dump:dumpCreate,db:Session=Depends(get_db)):
     if not dump:
         raise HTTPException(status_code=404)
     return dump
+
+
+@router.get("/",response_model=List[dumpReturn])
+def get_dump(date:date,db:Session=Depends(get_db)):
+    dump = service.get_dump(date,db)
+    if not dump:
+        raise HTTPException(status_code=404)
+    return dump
+
+
+
+
+
 
 
