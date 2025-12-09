@@ -1,17 +1,21 @@
-
-# Python
+# ---- Python ----
 venv/
 __pycache__/
 *.pyc
 
-# Environment variables
+# ---- Environment variables ----
 .env
 
-# Docker
-*.env
+# ---- Node / JavaScript ----
+node_modules/
+
+# ---- Docker ----
+*.log
+*.pid
 infra/pgdata/
 
-# VSCode / IDE files
+# ---- IDE / Editor ----
 .vscode/
 .idea/
+
 
