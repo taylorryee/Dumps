@@ -1,6 +1,7 @@
 import os, json, re
 from app.llm import client
 from app.llm import prompts
+from pydantic import BaseModel
 
 #This is the actual logic 
 DEFAULT_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
@@ -14,32 +15,43 @@ class OpenAIProvider:
 
     def summarize(self, text: str) -> str:
         instruction = prompts.SUMMARY_INSTRUCTIONS
-        prompt = prompts.SUMMARY_PROMPT.format(text=text)
         response = client.response_create(
             model=self.summary_model,
             instructions=instruction,
-            input=prompt, 
+            input=text, 
             max_output_tokens=800,
             timeout=DEFAULT_TIMEOUT,
         )
-        raw = response.output[0].content[0].text  
-        return raw.strip()
+        #raw = response.output[0].content[0].text  
+        return response.output_text
 
     def extract_thoughts(self, text: str):
-        prompt = prompts.THOUGHT_EXTRACTION_PROMPT.format(text=text)
         instruction = prompts.THOUGHT_EXTRACTION_INSTRUCTIONS
-
-        resp = client.response_create(
+        response = client.response_create(
             model=self.model,
             instructions=instruction,
-            input=prompt,
+            input=text,
             response_format={ "type": "json_object" },
             max_output_tokens=800,
             timeout=DEFAULT_TIMEOUT,
         )
-        raw = resp.output[0].content[0].text
+        #raw = response.output[0].content[0].text
 
-        return json.loads(raw)
+        return json.loads(response.output_text)
+
+    def give_thought_category(self,text:str):
+        instruction = prompts.THOUGHT_TO_CATEGORY
+        response = client.response_create(
+            model=self.model,
+            instructions=instruction,
+            input=text,
+            max_output_tokens=800,
+            timeout=DEFAULT_TIMEOUT
+        )
+        #raw = response.output[0].content[0].text
+        return response.output_text
+
+
 
     def embed(self, texts: list[str], model: str = "text-embedding-3-small"):
         # OpenAI embeddings: batch
