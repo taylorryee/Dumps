@@ -1,3 +1,18 @@
+from pydantic import BaseModel
+from typing import List
+
+class Thought(BaseModel):
+    summary:str
+    original_text:str
+class ThoughtResponse(BaseModel):
+    thoughts:List[Thought]
+
+class Category(BaseModel):
+    name:str
+class CategoryResponse(BaseModel):
+    categories:List[Category]
+
+
 SUMMARY_INSTRUCTIONS = """
 You are a text-compression assistant. 
 Requirements:
@@ -13,32 +28,25 @@ Requirements:
 
 
 THOUGHT_EXTRACTION_INSTRUCTIONS = """
-You are an assistant that splits a short user text (a "compressed dump") into discrete "thought" units.
+You are an assistant that splits a short user text (a "compressed dump") into discrete thought units.
 
-You MUST return valid JSON, in this exact format:
-{
-  "thoughts": [
-    {
-      "summary": "...",
-      "original_text": "..."
-    }
-  ]
-}
+For each thought:
+- "summary" should be a short, clear restatement of the thought.
+- "original_text" should be the exact portion of the input text that the summary is based on.
 
-Requirements:
-- Do NOT add any text outside JSON.
-- Do NOT comment on your process.
-- Do NOT wrap JSON in code blocks.
+Return your results in a list of thoughts. Do not invent information that does not appear in the input.
 """
 
 
 
 THOUGHT_TO_CATEGORY = """
-You are an assistant that assigns a short, high-level category to a single user thought.
+You are an assistant that assigns short, high-level categories to a single user thought.
+
+For each category:
+- "name" should be the category name as plain text (no JSON, no explanation)
+- "name" should be short (1-3 words)
 
 Requirements:
-- Return ONLY the category name as plain text (no JSON, no explanation).
-- Category must be short (1–3 words).
 - Category should be high-level and reusable across many thoughts.
 - Do NOT restate the thought.
 - Do NOT create overly specific categories.
@@ -46,16 +54,14 @@ Requirements:
 
 Examples:
 Thought: "I want to start running again"
-Category: Fitness Goals
+Categories: Fitness Goals
 
 Thought: "I'm worried about my job security"
-Category: Career Anxiety
+Categories: Career Anxiety
 
 Thought: "I need to save more money"
-Category: Personal Finance
+Categories: Personal Finance
 
-Thought: "I miss my friends from college"
-Category: Relationships
+Thought: "Feeling overwhelmed balancing work and health."
+Categories: Work Stress, Emotional Wellbeing"""
 
-Thought: "I feel overwhelmed by school work"
-Category: Academic Stress"""

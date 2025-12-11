@@ -5,6 +5,8 @@ from typing import List
 
 from app.db import get_db
 from app.schemas.dumpSchema import dumpCreate,dumpReturn
+from app.schemas.thoughtSchema import thoughtCreate,thoughtReturn
+
 from app.services import dumpServices as service
 from app.celery_app import celery_app
 
@@ -29,6 +31,12 @@ def get_dump(date:date,db:Session=Depends(get_db)):
         raise HTTPException(status_code=404)
     return dump
 
+@router.get("/thoughts",response_model=List[thoughtReturn])
+def get_thoughts(dump_id:int,db:Session=Depends(get_db)):
+    thoughts = service.get_thoughts(dump_id,db)
+    if not thoughts:
+        raise HTTPException(status_code=404)
+    return thoughts
 
 
 

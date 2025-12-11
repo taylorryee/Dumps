@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from categorySchema import categoryReturn
+from .categorySchema import categoryReturn
 
 class thoughtCreate(BaseModel):#This is just internal creation, user never actually creates a thought
     text:str

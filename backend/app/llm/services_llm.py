@@ -5,14 +5,15 @@ def summarize_text(text: str) -> str:
     return provider.summarize(text)
 
 
-
 def extract_thoughts(text: str):
     provider = get_provider()
     # Use hybrid flow: if text long, first summarize then extract
-    #if len(text) > 4000:   # you can change threshold to token-based later
-    text = provider.summarize(text)
-    results = provider.extract_thoughts(text)
-    return results
+    #if len(text) > 4000:   # you can change threshold to token-based late
+    return provider.extract_thoughts(text)
+    
+def extract_categories(text:str):
+    provider = get_provider()
+    return provider.extract_categories(text)
 
 def embed_texts(texts: list[str]):
     provider = get_provider()

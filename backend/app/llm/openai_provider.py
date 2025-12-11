@@ -2,8 +2,9 @@ import os, json, re
 from app.llm import client
 from app.llm import prompts
 from pydantic import BaseModel
+from typing import List
 
-#This is the actual logic 
+
 DEFAULT_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 DEFAULT_SUMMARY_MODEL = os.getenv("LLM_SUMMARY_MODEL", DEFAULT_MODEL)
 DEFAULT_TIMEOUT = int(os.getenv("LLM_TIMEOUT", "30"))
@@ -25,31 +26,31 @@ class OpenAIProvider:
         #raw = response.output[0].content[0].text  
         return response.output_text
 
-    def extract_thoughts(self, text: str):
+    def extract_thoughts(self, text: str)->prompts.ThoughtResponse:
         instruction = prompts.THOUGHT_EXTRACTION_INSTRUCTIONS
-        response = client.response_create(
+        response = client.response_parse(
             model=self.model,
             instructions=instruction,
             input=text,
-            response_format={ "type": "json_object" },
+            text_format=prompts.ThoughtResponse,
             max_output_tokens=800,
             timeout=DEFAULT_TIMEOUT,
         )
-        #raw = response.output[0].content[0].text
 
-        return json.loads(response.output_text)
+        return response.output_parsed
 
-    def give_thought_category(self,text:str):
+    def extract_categories(self,text:str):
         instruction = prompts.THOUGHT_TO_CATEGORY
-        response = client.response_create(
+        response = client.response_parse(
             model=self.model,
             instructions=instruction,
             input=text,
+            text_format=prompts.CategoryResponse,
             max_output_tokens=800,
             timeout=DEFAULT_TIMEOUT
         )
-        #raw = response.output[0].content[0].text
-        return response.output_text
+
+        return response.output_parsed
 
 
 

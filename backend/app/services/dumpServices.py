@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from datetime import date
 
-from app.models.models import Dump
+from app.models.models import Dump, Thought
 from app.schemas.dumpSchema import dumpCreate,dumpReturn
 from app.worker.tasks import process_dump
 
@@ -26,3 +26,7 @@ def create_dump(new_dump:dumpCreate,db:Session):
 def get_dump(date:date,db:Session):
     dump = db.query(Dump).filter(func.date(Dump.created_at) == date).all()
     return dump
+
+def get_thoughts(dump_id:int,db:Session):
+    thought = db.query(Thought).filter(Thought.dump_id==dump_id).all()
+    return thought

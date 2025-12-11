@@ -18,3 +18,6 @@ def response_create(**kwargs): #this calls the openai responses api - this api i
 
 def embeddings_create(**kwargs):#this calls the open ai embedding api
     return client.embeddings.create(**kwargs)
+
+def response_parse(**kwargs):
+    return client.responses.parse(**kwargs)
