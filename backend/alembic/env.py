@@ -1,24 +1,32 @@
 import os
+from pathlib import Path
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
 from alembic import context
+from sqlalchemy import engine_from_config, pool
+from dotenv import load_dotenv
 
-# Import your Base + models
+# Import your Base
 from app.db import Base
 from app.models.models import Dump, Thought, Category
+
+
+# ----------------------------------------------------
+# Load .env from infra/
+# ----------------------------------------------------
+BASE_DIR = Path(__file__).resolve().parents[2]
+env_path = BASE_DIR / "infra" / ".env"
+
+load_dotenv(env_path)
+
+database_url = os.getenv("DATABASE_URL")
+if not database_url:
+    raise Exception("DATABASE_URL environment variable is missing!")
 
 # ----------------------------------------------------
 # Load Alembic Config
 # ----------------------------------------------------
 config = context.config
-
-# Explicitly set sqlalchemy.url from ENV
-database_url = os.getenv("DATABASE_URL")
-if database_url is None:
-    raise Exception("DATABASE_URL environment variable is missing!")
-
 config.set_main_option("sqlalchemy.url", database_url)
 
 # ----------------------------------------------------
@@ -32,12 +40,10 @@ if config.config_file_name is not None:
 # ----------------------------------------------------
 target_metadata = Base.metadata
 
-
 # ----------------------------------------------------
 # Migration Runners
 # ----------------------------------------------------
 def run_migrations_offline() -> None:
-    """Run migrations in offline mode."""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -45,13 +51,11 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
-
     with context.begin_transaction():
         context.run_migrations()
 
 
 def run_migrations_online() -> None:
-    """Run migrations in online mode."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
