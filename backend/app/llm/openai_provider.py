@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import List
 
 
+
 DEFAULT_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 DEFAULT_SUMMARY_MODEL = os.getenv("LLM_SUMMARY_MODEL", DEFAULT_MODEL)
 DEFAULT_TIMEOUT = int(os.getenv("LLM_TIMEOUT", "30"))
@@ -54,8 +55,12 @@ class OpenAIProvider:
 
 
 
-    def embed(self, texts: list[str], model: str = "text-embedding-3-small"):
+    def embed_categories(self, texts: list[str], model: str = "text-embedding-3-small"):
         # OpenAI embeddings: batch
-        resp = client.embeddings_create(model=model, input=texts)
+        response = client.embeddings_create(model=model, input=texts)
         # resp["data"] is per-input embedding
-        return [item["embedding"] for item in resp["data"]]
+        
+        embeddings = [item.embedding for item in response.data] 
+        return embeddings
+    
+

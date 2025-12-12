@@ -6,6 +6,7 @@ from typing import List
 from app.db import get_db
 from app.schemas.dumpSchema import dumpCreate,dumpReturn
 from app.schemas.thoughtSchema import thoughtCreate,thoughtReturn
+from app.schemas.categorySchema import categoryCreate,categoryReturn
 
 from app.services import dumpServices as service
 from app.celery_app import celery_app
@@ -37,6 +38,13 @@ def get_thoughts(dump_id:int,db:Session=Depends(get_db)):
     if not thoughts:
         raise HTTPException(status_code=404)
     return thoughts
+
+@router.get("/categories",response_model=List[thoughtReturn])
+def get_category(category_id:int,db:Session=Depends(get_db)):
+    category = service.get_category(category_id,db)
+    if not category:
+        raise HTTPException(status_code=404)
+    return category
 
 
 
