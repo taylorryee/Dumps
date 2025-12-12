@@ -15,6 +15,7 @@ def extract_categories(text:str):
     provider = get_provider()
     return provider.extract_categories(text)
 
-def embed_texts(texts: list[str]):
+def embed_categories(texts: list[list[float]]):
     provider = get_provider()
-    return provider.embed(texts)
+    return provider.embed_categories(texts)
+

@@ -40,7 +40,7 @@ class Category(Base):#global table of categories
     __tablename__="categories"
     id = Column(Integer,primary_key=True,index=True)
     name = Column(String,unique=True,index=True)
-    #embedding = Column(Vector(1536)) #embedding dimension for OpenAI text-embedding-3-small
+    embedding = Column(Vector(1536)) #embedding dimension for OpenAI text-embedding-3-small
 
     thoughts = relationship("Thought", secondary="thoughts_categories", back_populates="categories")
     #Use the thoughts_categories table as the secondary join table.
