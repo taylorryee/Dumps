@@ -12,6 +12,8 @@ from app.schemas.userSchema import userCreate,userReturn,userLogin,userLoginRetu
 from app.services import userServices as service
 from app.celery_app import celery_app
 
+from fastapi.security import OAuth2PasswordRequestForm
+
 #CRUD - Create-Post, Read-Get
 router = APIRouter(prefix="/user",tags=["User Routes"])
 
@@ -34,4 +36,5 @@ def login(user:userLogin,db:Session=Depends(get_db)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password."
         )
+
     return logged_in

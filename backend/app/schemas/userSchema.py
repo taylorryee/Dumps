@@ -11,7 +11,7 @@ class userReturn(BaseModel):
         from_attributes = True
 
 class userLogin(BaseModel):
-    username:str
+    email:str
     password:str
 
 class userLoginReturn(BaseModel):

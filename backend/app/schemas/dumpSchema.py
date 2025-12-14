@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from app.schemas.categorySchema import categoryReturn
 from app.schemas.thoughtSchema import thoughtReturn
+from app.schemas.userSchema import userReturn
 from typing import List
 
 
@@ -10,6 +11,7 @@ class dumpCreate(BaseModel):
 class dumpReturn(BaseModel):
     id:int
     text:str
+
 
     class Config:
         from_attributes=True

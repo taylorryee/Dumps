@@ -3,13 +3,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from datetime import date
 
-from app.models.models import Dump, Thought,Category
+from app.models.models import Dump, Thought,Category,User
 from app.schemas.dumpSchema import dumpCreate,dumpReturn
 from app.worker.tasks import process_dump
 
 
-def create_dump(new_dump:dumpCreate,db:Session):
-    dump = Dump(text=new_dump.text)
+def create_dump(new_dump:dumpCreate,user:User,db:Session):
+    dump = Dump(text=new_dump.text,user_id=user.id)
     db.add(dump)
 
     try:
@@ -23,7 +23,7 @@ def create_dump(new_dump:dumpCreate,db:Session):
         db.rollback()
         return None
 
-def get_dump(date:date,db:Session):
+def get_dump(date:date,user:User,db:Session):
     dump = db.query(Dump).filter(func.date(Dump.created_at) == date).all()
     return dump
 

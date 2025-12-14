@@ -15,6 +15,8 @@ class User(Base):
     created_at = Column(DateTime(timezone=True),server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
 
+    dumps = relationship("Dump",back_populates="user")
+
 class Dump(Base): #intial thought dump
     __tablename__ = "dumps"
     id = Column(Integer,primary_key=True,index=True)
@@ -22,6 +24,9 @@ class Dump(Base): #intial thought dump
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     thoughts = relationship("Thought",back_populates="dump")
+    
+    user_id = Column(Integer,ForeignKey("users.id"))
+    user = relationship("User",back_populates="dumps")
 
 
 class Thought(Base):#indivual thoughts extracted from dump
