@@ -29,14 +29,14 @@ def create_user(user:userCreate,db:Session):
 
 
 def login(user:userLogin,db:Session):
-    cur_user = db.query(User).filter(User.username==user.username).first()
+    cur_user = db.query(User).filter(User.email==user.email).first()
     if not cur_user:
         return None
 
     if not verify_password(user.password,cur_user.hashed_password):
         return None
     
-    data = {"sub":cur_user.id}
+    data = {"sub":str(cur_user.id)}
     token = create_access_token(data)
-    return userLoginReturn(username = user.username,token=token)
+    return userLoginReturn(username = cur_user.username,token=token)
 

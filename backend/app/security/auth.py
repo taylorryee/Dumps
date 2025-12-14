@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import jwt, JWTError
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status,Header
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 import os
@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login") #This tells FastAPI
+#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login") #This tells FastAPI
 #This endpoint uses OAuth2 Bearer tokens. When a user calls a protected route, look in the 
 # Authorization: Bearer <token> header and pass the token string into the dependency.
 
@@ -51,12 +51,19 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None): 
 # -----------------------------
 # Get current user dependency
 # -----------------------------
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+
+def get_current_user(authorization:Optional[str]=Header(None), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    print("AUTH HEADER:", authorization)
+
+    if authorization is None or not authorization.startswith("Bearer "):
+        raise credentials_exception
+    token = authorization.split(" ", 1)[1]
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])#Decodes access token into original dicitonary if
         #with the username and expiration date if the signature is valid and not expired
@@ -71,6 +78,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
+
+
 
 #So now if i want to protect a route I just do this:
 #@router.get("/players/private")
