@@ -30,7 +30,7 @@ def create_dump_route(new_dump:dumpCreate,user=Depends(get_current_user),db:Sess
 @router.get("/",response_model=List[dumpReturn])
 def get_dump(date:date,user=Depends(get_current_user),db:Session=Depends(get_db)):
     dump = service.get_dump(date,db)
-    print("Hello fagggots")
+
     if not dump:
         raise HTTPException(status_code=404)
     return dump
