@@ -15,7 +15,7 @@ def create_dump(new_dump:dumpCreate,user:User,db:Session):
     try:
         db.commit()
         db.refresh(dump)
-        process_dump.delay(dump.id) # delay calls celery to package the function and input into a message that is then put 
+        process_dump.delay(dump.id,user.id) # delay calls celery to package the function and input into a message that is then put 
         #into redis queue -> then create_dump is able to end without waiting on all the time intenseive work of processing the
         #dump. A celery worker is then able look at the redis queue and pull taks to do the llm work in the backgroud
         return dump
@@ -24,7 +24,8 @@ def create_dump(new_dump:dumpCreate,user:User,db:Session):
         return None
 
 def get_dump(date:date,user:User,db:Session):
-    dump = db.query(Dump).filter(func.date(Dump.created_at) == date).all()
+
+    dump = db.query(Dump).filter(Dump.user_id==user.id,func.date(Dump.created_at) == date).all() #find dump of the user on a specific date
     return dump
 
 def get_thoughts(dump_id:int,db:Session):

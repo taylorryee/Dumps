@@ -13,7 +13,7 @@ from app.celery_app import celery_app
 
 from app.security.auth import get_current_user
 
-from fastapi import Security
+
 
 router = APIRouter(prefix = "/dump",tags=["Dump Routes"])
 
@@ -21,7 +21,7 @@ router = APIRouter(prefix = "/dump",tags=["Dump Routes"])
 
 @router.post("/",response_model=dumpReturn)
 def create_dump_route(new_dump:dumpCreate,user=Depends(get_current_user),db:Session=Depends(get_db)):
-    dump = service.create_dump(new_dump,db)
+    dump = service.create_dump(new_dump,user,db)
     if not dump:
         raise HTTPException(status_code=404)
     return dump
@@ -29,7 +29,7 @@ def create_dump_route(new_dump:dumpCreate,user=Depends(get_current_user),db:Sess
 
 @router.get("/",response_model=List[dumpReturn])
 def get_dump(date:date,user=Depends(get_current_user),db:Session=Depends(get_db)):
-    dump = service.get_dump(date,db)
+    dump = service.get_dump(date,user,db)
 
     if not dump:
         raise HTTPException(status_code=404)
