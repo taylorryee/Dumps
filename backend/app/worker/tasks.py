@@ -15,7 +15,7 @@ def find_similar_category(embedding_vector:list[float],threshold,db:Session):
     )
 
 @celery_app.task
-def process_dump(dump_id: int):
+def process_dump(dump_id: int, user_id:int):
     db: Session = SessionLocal()
 
     dump = db.query(Dump).get(dump_id)
