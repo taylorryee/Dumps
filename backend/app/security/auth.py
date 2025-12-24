@@ -80,7 +80,6 @@ def get_current_user(authorization:Optional[str]=Header(None), db: Session = Dep
     return user
 
 
-
 #So now if i want to protect a route I just do this:
 #@router.get("/players/private")
 #def my_team(current_user = Depends(get_current_user)): Now i just pass a dependancy into the route i want protected

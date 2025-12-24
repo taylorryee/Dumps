@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+
 #this is frontend host that is allowed to talk with backend
 app.add_middleware(
     CORSMiddleware,
