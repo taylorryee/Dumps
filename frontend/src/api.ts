@@ -9,4 +9,15 @@ const api = axios.create({ //this creates an axios instance. You can now use thi
   },
 });
 
+api.interceptors.request.use((config) => { //This runs before every request and checks localStorage for a token to attach to request
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
+
 export default api;

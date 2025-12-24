@@ -17,7 +17,7 @@ class User(Base):
 
     dumps = relationship("Dump",back_populates="user")
 
-    categories = relationship("Category",back_populates="users")
+    categories = relationship("Category",secondary = "users_categories", back_populates="users")
 
 
 class Dump(Base): #intial thought dump
