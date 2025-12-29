@@ -1,7 +1,13 @@
-
+import Button from "../components/Button"
+import {useAuth} from "../AuthContext"
 
 function HomePage(){
-    return(<h1>omg dis da home page ts blank bru</h1>);
+    const auth = useAuth()
+    return(<div>
+
+        <Button label = "logout" onClick = {auth.logout}/>
+
+        </div>);
 }
 
 export default HomePage;

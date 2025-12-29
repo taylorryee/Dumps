@@ -4,18 +4,21 @@ import {useNavigate,Link} from "react-router-dom"
 import api from "../api"
 import TextInput from "../components/TextInput"
 import Button from "../components/Button"
+import {useAuth} from "../AuthContext"
 
 function LoginPage(){
     const [password,setPassword] = useState("");
     const [email,setEmail] = useState("");
     const navigate = useNavigate();
+    const auth = useAuth()
     const handleLogin = async () =>{
         try{
             const response = await api.post("/user/login",{email,password})
             console.log(response.data,"ya boiz we logged in")
             
-            const token = response.data.access_token
-            localStorage.setItem("token", token);
+            //const token = response.data.access_token
+            //localStorage.setItem("token", token);
+            auth.login(response.data.access_token)
             
             navigate("/home")
         
