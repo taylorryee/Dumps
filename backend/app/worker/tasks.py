@@ -61,12 +61,12 @@ def process_dump(dump_id: int, user_id:int):
         
         for i,name in enumerate(category_names):#iterate throught the categories that llm assigned to a dump.
             
-            similar_user_category = find_similar_user_category(user_id,category_embeddings[i],0.4,db)#searches for a similar user category
+            similar_user_category = find_similar_user_category(name,user_id,category_embeddings[i],0.4,db)#searches for a similar user category
             
             if similar_user_category:#if user has already has category then we know that global categories already has category as well
                 category_id = similar_user_category.id
             else:
-                similar_category = find_similar_category(category_embeddings[i],0.4,db) #searches through global categories and if there is a category/categories found within the embedding threshold it is returned
+                similar_category = find_similar_category(name,category_embeddings[i],0.4,db) #searches through global categories and if there is a category/categories found within the embedding threshold it is returned
                 
                 if similar_category:#if there exists a global category already-add this category to users personal category list
                     newUserCategory = UserCategory(user_id=user_id,category_id=similar_category.id)
