@@ -18,7 +18,7 @@ function LoginPage(){
             
             //const token = response.data.access_token
             //localStorage.setItem("token", token);
-            auth.login(response.data.access_token)
+            auth.login(response.data.token)
             
             navigate("/home")
         
