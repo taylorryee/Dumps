@@ -3,6 +3,7 @@ from app.schemas.categorySchema import categoryReturn
 from app.schemas.thoughtSchema import thoughtReturn
 from app.schemas.userSchema import userReturn
 from typing import List
+from datetime import datetime
 
 
 class dumpCreate(BaseModel):
@@ -11,6 +12,8 @@ class dumpCreate(BaseModel):
 class dumpReturn(BaseModel):
     id:int
     text:str
+    user_id:int
+    created_at:datetime
 
 
     class Config:

@@ -35,3 +35,10 @@ def get_thoughts(dump_id:int,db:Session):
 def get_category(category_id:int,db:Session):
     category = db.query(Category).filter(Category.id==category_id).first()
     return category.thoughts
+
+def get_all_dumps(user:User,db:Session):
+    #cur_user = db.query(User).filter(User.id==user_id).first()
+    #if not cur_user:
+     #   return None
+    
+    return user.dumps
