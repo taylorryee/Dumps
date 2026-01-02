@@ -44,7 +44,7 @@ def process_dump(dump_id: int, user_id:int):
 
     dump = db.query(Dump).get(dump_id)
     summarized = summarize_text(dump.text)
-    dump.text = summarized
+    dump.text = summarized #####################CHange this should not be editing original dumps text 
     db.add(dump)
 
     thoughts = extract_thoughts(dump.text)

@@ -49,6 +49,13 @@ def get_category(category_id:int,db:Session=Depends(get_db)):
         raise HTTPException(status_code=404)
     return category
 
+@router.get("/all",response_model=List[dumpReturn])
+def get_all_dumps(user=Depends(get_current_user),db:Session=Depends(get_db)):
+    all_dumps = service.get_all_dumps(user,db)
+    if not all_dumps:
+        raise HTTPException(status_code=404)
+    return all_dumps
+
 
 
 
