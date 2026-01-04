@@ -1,6 +1,6 @@
 import {useState,useEffect} from 'react'
 import api from "../api"
-
+import DumpCard from "../components/DumpCard"
 function MindPage(){
     type Dump ={
         id:number
@@ -38,13 +38,11 @@ function MindPage(){
 
     return(
         <div>
-            <h1>Dam bru this really you mind - this shit kinda fucked up huh</h1>
-            
+            <DumpCard text="test twin"/>            
             {dumps.length === 0 && <p>No dumps yet.</p>}
 
             {dumps.map(dump=>(
                 <div key = {dump.id}>
-                    
                     <p>{dump.text}:{new Date(dump.created_at).toLocaleString()}</p>
                 </div>
             ))}
