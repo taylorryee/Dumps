@@ -1,3 +1,4 @@
+import "./Button.css"
 
 type ValueProps={
     label:string
@@ -6,7 +7,7 @@ type ValueProps={
 
 function Button({label,onClick}:ValueProps){
     return (
-        <button onClick={onClick}>{label}</button>
+        <button className = "button" onClick={onClick}>{label}</button>
     );
 }
 

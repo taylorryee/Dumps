@@ -4,6 +4,7 @@ import CreateAccountPage from "./pages/CreateAccountPage"
 import HomePage from "./pages/HomePage"
 import ProtectedRoute from "./ProtectedRoute"
 import MindPage from "./pages/MindPage"
+import TimelinePage from "./pages/TimelinePage"
 //This is root component. Composes all other components for layout and structure. Holds top level state + routing
 function App(){
 
@@ -14,6 +15,7 @@ function App(){
         <Route path="/home" element={<ProtectedRoute><HomePage/></ProtectedRoute>} />
         <Route path="/createAccount" element={<CreateAccountPage/>}/>
         <Route path ="mind" element={<ProtectedRoute><MindPage/></ProtectedRoute>}/>
+        <Route path="timeline" element={<ProtectedRoute><TimelinePage/></ProtectedRoute>}/>
       </Routes>
     </div>
 
