@@ -1,5 +1,5 @@
 import {useState} from "react"
-import style from "./DumpCard.module.css"
+import styles from "./DumpCard.module.css"
 
 type Dump ={
     text:string
@@ -7,10 +7,11 @@ type Dump ={
 
 function DumpCard({text}:Dump){
 
+    const [expanded,setExpanded] = useState(false)
     
     return(
-        <div className={style.card}>
-            <h1 className = {style.text}>{text}</h1>
+        <div onClick ={()=>setExpanded(!expanded)} className={expanded ? styles.expanded : styles.card}>
+            <h1 className = {styles.text}>{text}</h1>
         </div>
 
     );
