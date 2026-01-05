@@ -1,7 +1,6 @@
 from app.celery_app import celery_app
 from sqlalchemy.orm import Session
 from app.db import SessionLocal
-#from backend.llm import process_dump_with_llm
 from app.models.models import Dump,Thought,Category,ThoughtCategory,User,UserCategory
 from sqlalchemy import asc,func
 from app.llm.services_llm import summarize_text, extract_thoughts,extract_categories,embed_categories
@@ -44,10 +43,10 @@ def process_dump(dump_id: int, user_id:int):
 
     dump = db.query(Dump).get(dump_id)
     summarized = summarize_text(dump.text)
-    dump.text = summarized #####################CHange this should not be editing original dumps text 
-    db.add(dump)
+    #dump.text = summarized #####################CHange this should not be editing original dumps n
+    #db.add(dump)
 
-    thoughts = extract_thoughts(dump.text)
+    thoughts = extract_thoughts(summarized)
     
     for thought in thoughts.thoughts:
         

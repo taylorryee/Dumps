@@ -1,7 +1,10 @@
 .container{
     display:flex;
-    flex-direction:row; /*aligns items along horizontal axis*/
+    /*flex-direction:row; /*aligns items along horizontal axis*/
     
-    justify-content:space-evenly;/*positions items along the main axis you are using*/
+    justify-content:center;/*positions items along the main axis you are using*/
     align-items:center;/*positions items along cross axis*/
+    height: 100vh;
+    gap:2rem;
+    overflow-x: auto;
 }
