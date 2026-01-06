@@ -1,0 +1,50 @@
+.card{
+    background-color:rgb(250, 250, 250);
+    padding:1rem;
+    
+    width:300px;
+    height:300px;
+    max-height:300px;
+    max-width:300px;
+
+    cursor:pointer;
+    
+    border: 1px solid black;
+    border-radius: 8px; /*creates rounded corner*/
+    
+    overflow:hidden;
+    transition: max-height 0.25s ease;
+    margin: 0;
+    white-space: normal;          /* allow wrapping */
+    overflow-wrap: break-word;  
+}
+
+.expanded{
+        background-color:rgb(250, 250, 250);
+    
+    width:600px;
+    height:600px;
+    
+    border: 1px solid black;
+    border-radius: 8px; /*creates rounded corner*/
+
+    overflow-y:auto;
+
+  margin: 0;
+  white-space: normal;          /* allow wrapping */
+  overflow-wrap: break-word;  
+
+  padding:1rem
+
+}   
+
+.textarea{
+width: 100%;
+  height: 100%;
+  border: none;      /* remove default textarea border */
+  outline: none;     /* remove outline when focused */
+  resize: none;      /* prevent resizing handle */
+  background: transparent; /* inherit div background */
+  font-family: inherit;
+  font-size: 1rem;
+}
