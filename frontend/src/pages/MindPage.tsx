@@ -1,6 +1,7 @@
 import {useState,useEffect} from 'react'
 import api from "../api"
-import DumpCard from "../components/DumpCard"
+import DumpCardInput from "../components/DumpCardInput"
+
 function MindPage(){
     type Dump ={
         id:number
@@ -30,15 +31,16 @@ function MindPage(){
     }, [dumps]);
 
     useEffect(()=>{getDumps()},[])
+
+    
+    const [text,setText] = useState("")
     
     if (loading){
         return <h1>Loading...</h1>;
     }
-
-
     return(
-        <div>
-            <DumpCard text="test twin"/>            
+        <div>      
+            <DumpCardInput text={text} onChange = {(newText)=>setText(newText)}/>   
             {dumps.length === 0 && <p>No dumps yet.</p>}
 
             {dumps.map(dump=>(
