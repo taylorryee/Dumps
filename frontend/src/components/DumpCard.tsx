@@ -3,15 +3,16 @@ import styles from "./DumpCard.module.css"
 
 type Dump ={
     text:string
+    date:string
 }
 
-function DumpCard({text}:Dump){
+function DumpCard({text,date}:Dump){
 
     const [expanded,setExpanded] = useState(false)
     
     return(
         <div onClick ={()=>setExpanded(!expanded)} className={expanded ? styles.expanded : styles.card}>
-            <h1 className = {styles.text}>{text}</h1>
+            <h1 className = {styles.text}>{text}:{date}</h1>
         </div>
 
     );
