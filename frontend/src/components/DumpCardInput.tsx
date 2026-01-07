@@ -1,7 +1,5 @@
-import {useState} from "react"
-import api from "../api"
-import Button from "../components/Button"
-import TextInput from "../components/TextInput"
+import {useState,useRef,useEffect} from "react"
+
 import styles from "./DumpCardInput.module.css"
 
 type Input = {
@@ -11,14 +9,19 @@ type Input = {
 
 function DumpCardInput({text,onChange}:Input){
 
+    const focusRef= useRef<HTMLTextAreaElement>(null)
 
-    //const [text,setText] = useState("")
-    
     const [expanded,toggleExpand] = useState(false)
+    useEffect(()=>{
+        if (focusRef.current){
+            focusRef.current.focus()
+        }
+
+    },[])
 
     return(
         <div onClick = {()=>toggleExpand(!expanded)} className = {expanded ? styles.expanded: styles.card}>
-            <textarea value ={text} onChange = {(e)=>onChange(e.target.value)} className={styles.textarea}/>
+            <textarea ref = {focusRef} value ={text} onChange = {(e)=>onChange(e.target.value)} className={styles.textarea}/>
         </div>
     );
 }
