@@ -6,8 +6,7 @@
     height:300px;
     max-height:300px;
     max-width:300px;
-    min-width:300px;
-    min-height:300px; 
+
 
     cursor:pointer;
     
@@ -26,8 +25,7 @@
     
     width:600px;
     height:600px;
-    min-width:600px;
-    min-height:600px;
+
     
     border: 1px solid black;
     border-radius: 8px; /*creates rounded corner*/

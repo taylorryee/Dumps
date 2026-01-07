@@ -30,7 +30,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # -----------------------------
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 1000 #SUPER HIGH FOR TESTING - NEEDS TO BE CHANGED FOR PRODUCTION
 
 #oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login") #This tells FastAPI
 #This endpoint uses OAuth2 Bearer tokens. When a user calls a protected route, look in the 

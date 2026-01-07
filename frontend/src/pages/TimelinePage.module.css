@@ -1,0 +1,43 @@
+.page{
+    display:grid
+}
+
+.timelineContainer{
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem
+
+}
+
+.timelineContainer >*{
+    flex:0 0 auto
+}
+.timelineCardContainer{
+    display: flex; 
+    flex-direction:row-reverse;
+    gap:2rem;
+
+    height:100vh;
+    align-items: center;
+
+    overflow-x: auto;
+
+
+}
+
+.timelineCardContainer > *{ /*This tells all children in container to not grow or shrink and keep natural size. > * is the operater you use to declare you are working on the flex items of timelineContainer*/
+    flex:0 0 auto;
+
+}
+
+.timelineCardSpacer{
+    flex:0 0 45vw;
+}
+
+
+.timelineDatesSubmit{
+
+}
+
+
+
