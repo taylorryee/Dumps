@@ -1,7 +1,7 @@
 import DumpCard from "../components/DumpCard"
 import styles from "./TimeLinePage.module.css"
 import api from "../api"
-import {useState,useEffect} from "react"
+import {useState,useEffect,useRef} from "react"
 import DumpCardInput from "../components/DumpCardInput"
 import Button from "../components/Button"
 
@@ -19,6 +19,7 @@ function TimelinePage(){
     const [dumps,setDumps] = useState<Dump[]>([])
         
     const [text,setText] = useState("")
+
     
     const getDumps = async () => {
         try{
@@ -46,25 +47,28 @@ function TimelinePage(){
 
 
     useEffect(()=>{getDumps()},[])
+
     
     return(
         <div className = {styles.page}>
-            <div className={styles.timelineContainer}>
+
                 <div className = {styles.timelineCardContainer}> 
                     <div className={styles.timelineCardSpacer}/>
-                    <div>
+                    <div className={styles.inputCard}>
                         <DumpCardInput text={text} onChange={setText} /> 
+                        <Button label="submit" onClick={()=>{createDump(text)}} />
                     </div>
 
                     {[...dumps].reverse().map(dump=>(
-                        <div key = {dump.id}>
-                            <DumpCard text = {dump.text} date={new Date(dump.created_at).toLocaleString()}/>
+                        <div key = {dump.id} className={styles.cardDate}>
+                            <DumpCard text = {dump.text} date=""/>
+                            <h1>{new Date(dump.created_at).toLocaleString()}</h1>
                         </div>
                     ))}
                 </div>
 
-                <Button label="submit" onClick={()=>{setText(text)}} />
-            </div>
+
+
         </div>
         
 

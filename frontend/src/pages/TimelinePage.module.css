@@ -2,16 +2,6 @@
     display:grid
 }
 
-.timelineContainer{
-    display:flex;
-    flex-direction:column;
-    gap:0.5rem
-
-}
-
-.timelineContainer >*{
-    flex:0 0 auto
-}
 .timelineCardContainer{
     display: flex; 
     flex-direction:row-reverse;
@@ -25,7 +15,7 @@
 
 }
 
-.timelineCardContainer > *{ /*This tells all children in container to not grow or shrink and keep natural size. > * is the operater you use to declare you are working on the flex items of timelineContainer*/
+.timelineCardContainer > *{ 
     flex:0 0 auto;
 
 }
@@ -35,9 +25,52 @@
 }
 
 
-.timelineDatesSubmit{
+.inputCard{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    align-items:center;
 
 }
 
+.cardDate{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    align-items:center;
+}
+
+
+
+
+/*.inputCard {
+  position: relative;      
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: stretch;
+  padding: 1rem;
+  height: 100%;    
+
+
+}
+
+.inputCard Button {
+  position: absolute;
+  bottom: 17rem;          
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.inputCard {
+  display: flex;           
+  flex-direction: column;      
+  justify-content: center;     
+  
+  gap: 0.5rem;             
+  padding: 1rem;      
+  height: 100%;               
+
+}*/
 
 
