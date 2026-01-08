@@ -12,7 +12,7 @@ function DumpCard({text,date}:Dump){
     
     return(
         <div onClick ={()=>setExpanded(!expanded)} className={expanded ? styles.expanded : styles.card}>
-            <h1 className = {styles.text}>{text}:{date}</h1>
+            <h1 className = {styles.text}>{text}{date}</h1>
         </div>
 
     );
