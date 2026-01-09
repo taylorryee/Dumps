@@ -51,14 +51,14 @@ function TimelinePage(){
     
     return(
         <div className = {styles.page}>
+            <div className ={styles.timelineWrapper}>
+                <div className={styles.timelineCardSpacer}/>
+                <div className={styles.inputCard}>
+                    <DumpCardInput text={text} onChange={setText} />    
+                    <Button label="submit" onClick={()=>createDump(text)}/> 
+                </div>
 
                 <div className = {styles.timelineCardContainer}> 
-                    <div className={styles.timelineCardSpacer}/>
-                    <div className={styles.inputCard}>
-                        <DumpCardInput text={text} onChange={setText} /> 
-                        <Button label="submit" onClick={()=>{createDump(text)}} />
-                    </div>
-
                     {[...dumps].reverse().map(dump=>(
                         <div key = {dump.id} className={styles.cardDate}>
                             <DumpCard text = {dump.text} date=""/>
@@ -67,11 +67,9 @@ function TimelinePage(){
                     ))}
                 </div>
 
-
+            </div>      
 
         </div>
-        
-
 
     );
 }
