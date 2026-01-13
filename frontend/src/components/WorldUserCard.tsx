@@ -1,17 +1,21 @@
 import api from "../api"
 import {useState} from "react"
+import style form "WorldCard.module.css"
 
+type Dump = {
+    text:string
+    created_at:string
+}
+type User = {
+    username:string
+    dumps:Dump[]
+}
+function WorldUserCard({username,dumps}:User){
 
-function WorldUserCard(){
-    const getUserProfile = async () => {
-        try{
+    const [expanded,toggleExpand] = useState(false)
 
-        }catch{
-
-        }
-    }
     return(
-        <div>
+        <div className = >
 
         </div>
     );
