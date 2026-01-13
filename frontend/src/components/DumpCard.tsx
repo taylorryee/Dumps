@@ -1,10 +1,11 @@
-import {useState,useCallback,useRef,useEffect} from "react"
+import {useState,useCallback,useRef,useEffect,forwardRef} from "react"
 import styles from "./DumpCard.module.css"
 
 type Dump ={
     text:string
     date:string
 }
+
 
 function DumpCard({text,date}:Dump){
 
@@ -19,6 +20,7 @@ function DumpCard({text,date}:Dump){
 
     },[expanded])
 
+
     useEffect(()=>{
 
         document.addEventListener("mousedown", handleClickOutside);
@@ -27,8 +29,10 @@ function DumpCard({text,date}:Dump){
         };
     },[handleClickOutside])
     
+
+    
     return(
-        <div ref = {containerRef} onClick = {!expanded ? ()=>setExpanded(true):()=>{}} className={expanded ? styles.expanded : styles.card}>
+        <div ref = {containerRef} onClick = {!expanded?()=>setExpanded(true):()=>{}} className={expanded ? styles.expanded : styles.card}>
             <h1 className = {styles.text}>{text}{date}</h1>
         </div>
 

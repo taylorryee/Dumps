@@ -1,5 +1,9 @@
 .page{
-    display:grid
+    display:grid;
+    grid-template-rows:100vh ;
+    grid-template-columns:100vw ;
+
+    overflow:hidden;
 }
 
 .timelineCardContainer{

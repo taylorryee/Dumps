@@ -20,6 +20,8 @@ function TimelinePage(){
         
     const [text,setText] = useState("")
 
+
+    const cardRef = useRef<HTMLDivElement>(null)    
     
     const getDumps = async () => {
         try{
@@ -48,9 +50,11 @@ function TimelinePage(){
 
     useEffect(()=>{getDumps()},[])
 
+
+
     
     return(
-        <div className = {styles.page}>
+  
             <div className ={styles.timelineWrapper}>
                 <div className={styles.timelineCardSpacer}/>
                 <div className={styles.inputCard}>
@@ -62,14 +66,14 @@ function TimelinePage(){
                     {[...dumps].reverse().map(dump=>(
                         <div key = {dump.id} className={styles.cardDate}>
                             <DumpCard text = {dump.text} date=""/>
-                            <h1>{new Date(dump.created_at).toLocaleString()}</h1>
+                            <h1>{new Date(dump.created_at).toLocaleTimeString()}</h1>
                         </div>
                     ))}
                 </div>
 
             </div>      
 
-        </div>
+
 
     );
 }
