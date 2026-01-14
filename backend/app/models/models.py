@@ -70,6 +70,7 @@ class Category(Base):#global table of categories
 
 
 
+
 ######################################## JOIN TABLES ############################################################
 
 class ThoughtCategory(Base):#join table - used for many-many relationship between category and thought

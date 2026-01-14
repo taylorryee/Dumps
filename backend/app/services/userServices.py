@@ -1,10 +1,21 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 from sqlalchemy.exc import IntegrityError
 from app.models.models import User
-from app.schemas.userSchema import userCreate,userReturn,userLogin,userLoginReturn
+from app.schemas.userSchema import userCreate,userCreateReturn,userLogin,userLoginReturn,userProfileReturn
 from coolname import generate_slug
-
+from app.models.models import Dump, Thought,Category,User
 from app.security.auth import hash_password,verify_password,create_access_token
+
+
+def get_all_user_profiles(db):
+    db_profiles = db.query(User).options(joinedload(User.dumps)).all() #This calls a join on the User and Dump table and autoloads the User.dumps field with the dumps
+
+    profileReturn = []
+
+    for profile in db_profiles:
+        profileReturn.append(userProfileReturn(id=profile.id,username=profile.username,dumps=profile.dumps))
+    
+    return profileReturn
 
 
 def create_user(user:userCreate,db:Session):
@@ -38,5 +49,10 @@ def login(user:userLogin,db:Session):
     
     data = {"sub":str(cur_user.id)}
     token = create_access_token(data)
-    return userLoginReturn(username = cur_user.username,token=token)
+    return userLoginReturn(id = cur_user.id, username = cur_user.username,token=token)
+
+def get_user_profile(user:User,db:Session):
+    dumps = db.query(Dump).filter(Dump.user_id == user.id).all()
+    return userProfileReturn(id=user.id, username=user.username, dumps = dumps)
+
 

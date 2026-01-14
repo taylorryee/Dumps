@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from app.schemas.categorySchema import categoryReturn
 from app.schemas.thoughtSchema import thoughtReturn
-from app.schemas.userSchema import userReturn
+
 from typing import List
 from datetime import datetime
 
@@ -22,7 +22,7 @@ class dumpReturn(BaseModel):
 
 class dumpProfile(BaseModel):
     id:int
-    dump:dumpReturn
+    text:dumpReturn
     thoughts:List[thoughtReturn]
     categories:List[categoryReturn]
 

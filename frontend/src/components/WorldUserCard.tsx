@@ -1,22 +1,35 @@
 import api from "../api"
 import {useState} from "react"
-import style form "WorldCard.module.css"
+import DumpCard from "../components/DumpCard"
+
 
 type Dump = {
+    id:number
     text:string
     created_at:string
 }
-type User = {
+
+type User ={
+    id:number
     username:string
     dumps:Dump[]
 }
-function WorldUserCard({username,dumps}:User){
+type Props = {
+    user:User
+    isExpanded:boolean
+    onExpand:()=>void
+    onCollapse:()=>void
+    style?: React.CSSProperties
+}
+function WorldUserCard({user,isExpanded,onExpand,onCollapse,style}:Props){
 
-    const [expanded,toggleExpand] = useState(false)
 
     return(
-        <div className = >
-
+        <div style = {{...style}}onClick = {isExpanded?onCollapse:onExpand}>
+            {user.dumps[0] && <DumpCard text={user.dumps[0].text} date={""} />}
+            {isExpanded && user.dumps.map(dump=>(
+                <DumpCard text={dump.text} date=""/>    
+            ))}
         </div>
     );
 }

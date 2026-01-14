@@ -20,8 +20,6 @@ function TimelinePage(){
         
     const [text,setText] = useState("")
 
-
-    const cardRef = useRef<HTMLDivElement>(null)    
     
     const getDumps = async () => {
         try{

@@ -42,3 +42,11 @@ def get_all_dumps(user:User,db:Session):
      #   return None
     
     return user.dumps
+
+
+def get_user_daily_dumps(user:User,db:Session):
+    today = date.today()
+    todays_dumps = db.query(Dump).filter(Dump.user_id==user.id).filter(func.date(Dump.created_at)==today).all()
+    return todays_dumps
+
+

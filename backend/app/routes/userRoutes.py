@@ -7,17 +7,23 @@ from app.db import get_db
 from app.schemas.dumpSchema import dumpCreate,dumpReturn
 from app.schemas.thoughtSchema import thoughtCreate,thoughtReturn
 from app.schemas.categorySchema import categoryCreate,categoryReturn
-from app.schemas.userSchema import userCreate,userReturn,userLogin,userLoginReturn
+from app.schemas.userSchema import userCreate,userCreateReturn,userLogin,userLoginReturn,userProfileReturn
 
 from app.services import userServices as service
 from app.celery_app import celery_app
 
-from fastapi.security import OAuth2PasswordRequestForm
+from app.security.auth import get_current_user
+from app.models.models import Dump, Thought,Category,User
 
 #CRUD - Create-Post, Read-Get
 router = APIRouter(prefix="/user",tags=["User Routes"])
 
-@router.post("/create",response_model = userReturn)
+@router.get("/all",response_model = List[userProfileReturn])
+def get_all_user_profiles(db:Session=Depends(get_db)):
+    profiles = service.get_all_user_profiles(db)
+    return profiles
+
+@router.post("/create",response_model = userCreateReturn)
 def create_user(user:userCreate,db:Session=Depends(get_db)):
     new_user = service.create_user(user,db)
     if not new_user:
@@ -38,3 +44,14 @@ def login(user:userLogin,db:Session=Depends(get_db)):
         )
 
     return logged_in
+
+
+@router.get("/profile",response_model = userProfileReturn)
+def get_user_profile(user=Depends(get_current_user),db:Session=Depends(get_db)):
+    user_profile = service.get_user_profile(user,db)
+    if not user_profile:
+        raise HTTPException()
+
+    return user_profile
+
+

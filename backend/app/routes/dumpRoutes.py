@@ -57,6 +57,14 @@ def get_all_dumps(user=Depends(get_current_user),db:Session=Depends(get_db)):
     return all_dumps
 
 
+@router.get("/today",response_model=List[dumpReturn])
+def get_user_daily_dumps(user=Depends(get_current_user),db:Session=Depends(get_db)):
+    todays_dumps = service.get_user_daily_dumps(user,db)
+    
+    return todays_dumps
+
+
+
 
 
 
