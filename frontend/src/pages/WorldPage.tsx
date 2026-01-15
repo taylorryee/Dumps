@@ -1,13 +1,15 @@
 import api from "../api"
 import { useState, useEffect,useRef } from "react"
-import WorldUserCard from "../components/WorldUserCard"
+import WorldUserCardTest from "../components/WorldUserCardTest"
+import { computeUserPositions } from "../utils/computeUserPositions";
+import { forceSimulation, forceCollide, forceX, forceY } from "d3-force";
 
-type Dump = {
+export type Dump = {
     id: number
     text: string
     created_at: string
 }
-type User = {
+export type User = {
     id: number
     username: string
     dumps: Dump[]
@@ -15,23 +17,26 @@ type User = {
     y?: number
 }
 
-// Seeded random function
-const seededRandom = (str: string) => {
-    let h = 2166136261; // FNV-1a hash base
-    for (let i = 0; i < str.length; i++) {
-        h ^= str.charCodeAt(i)
-        h *= 16777619
-    }
-    return (h >>> 0) / 4294967296
-}
+type ForceNode = { x: number; y: number; };
 
+export const seededRandom = (str: string) => {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h *= 16777619;
+    }
+    return (h >>> 0) / 4294967296;
+};
 function WorldPage() {
 // *****************Session seed (persistent per session)*********************************************************
-    let sessionSeed = sessionStorage.getItem("worldSeed")
+    /*let sessionSeed = sessionStorage.getItem("worldSeed")
     if (!sessionSeed) {
         sessionSeed = Math.random().toString(36).substring(2)
         sessionStorage.setItem("worldSeed", sessionSeed)
-    }
+    }*/
+
+    const sessionSeed = Math.random().toString(36).substring(2); // new seed every refresh
+
  
     
  //***************************************STATE********************************************************************* */
@@ -39,7 +44,7 @@ function WorldPage() {
     const [userProfiles, setUserProfiles] = useState<User[]>([])
 
     
-    const [cameraX, setCameraX] = useState(0)
+    const [cameraX, setCameraX] = useState(0) // x,y coordinate of center of camera 
     const [cameraY, setCameraY] = useState(0)
 
 //************************************** VIEWPORT ***********************************************************/
@@ -92,11 +97,28 @@ function WorldPage() {
     }, [])
 
 //******************************** CREATING USER PROFILES + GIVING PROFILES A COORDINATE **************************** */
-    const getUserProfiles = async () => {
-        const BASE_RADIUS = 500 // Base radius for clustering near center
+    
+/*const getUserProfiles = async () => { FIX THIS LATER -> ABSTRACT D3
+        try{
+            
+            const response = await api.get("/users.all")
+            const profiles = computeUserPositions(response.data,sessionSeed)
+            setUserProfiles(profiles)
+        
+        }catch(err:any){
+
+        }
+    }*/
+
+        const getUserProfiles = async () => {
+
+        //const BASE_RADIUS = 10000// Base radius for clustering near center
         try {
             const response = await api.get("/user/all")
-            const profiles = response.data.map((user: User, index: number) => {
+            const numUsers = response.data.length;
+            const BASE_RADIUS = Math.sqrt(numUsers) * 200; //This is the scaling factor for intial distance of cards from center. Scales based on number of users
+            
+            const profiles = response.data.map((user: User) => {
 
                 // Polar coordinates for clustering
                 const theta = seededRandom(user.id + sessionSeed) * 2 * Math.PI
@@ -111,74 +133,68 @@ function WorldPage() {
                     y
                 }
             })
+            //*************************************** D3-force to resolve overlap ********************************************************** */
+            
+            // Map profiles to simulation nodes
+            const nodes:ForceNode[] = profiles.map((user:User) => ({x:user.x ?? 0, y:user.y ?? 0 }))
+            
+            const CARD_WIDTH = 100; 
+            const CARD_HEIGHT = 100; 
+            const CARD_RADIUS = Math.sqrt(CARD_WIDTH ** 2 + CARD_HEIGHT ** 2) / 2 + 50; // +50 for distance between cards
 
+            
+            const simulation = forceSimulation(nodes) //this creates the simulation for the nodes
+                .force("collide", forceCollide(CARD_RADIUS)) //this is the collision force, it pushes nodes apart if nodes get closer than CARD_RADIUS
+                .force("x", forceX(0).strength(0.001)) // strength of force pulling node towards 0 on x axis -> 
+                .force("y", forceY(0).strength(0.001)) //strengh of force pulling node towards 0 on y axis
+                .stop()//Stops force simulation
+
+            for (let i = 0; i < 10; i++) simulation.tick() //runs forceSimulation variable nubmer of times -> decreaes iterations for more random distribution
+
+            // Step 3: Copy final positions back into profiles
+            nodes.forEach((node, i) => {
+                profiles[i].x = node.x
+                profiles[i].y = node.y
+            })
             setUserProfiles(profiles)
         } catch (err: any) {
             console.error(err)
         }
     }
 
+
     useEffect(() => { getUserProfiles() }, [])
-    useEffect(() => { console.log(userProfiles) }, [userProfiles])
+    //useEffect(() => { console.log(userProfiles) }, [userProfiles])
+
 
 //***********************************VISIBLE USERS************************************************************ */
     const visibleUsers = userProfiles.filter(user=>{
         if(user.x==undefined || user.y==undefined)return false
         return(
-            user.x > cameraX - viewport.width/2 - 200 && 
-            user.x < cameraX + viewport.width/2 + 200 && 
-            user.y > cameraY - viewport.height/2 - 200 &&
-            user.y < cameraY + viewport.height/2 + 200 
+            user.x > cameraX - viewport.width/2 - 1000 && //checking if user is within right edge of viewport + 200 buffer
+            user.x < cameraX + viewport.width/2 + 1000 && //left edge
+            user.y > cameraY - viewport.height/2 - 1000 && //bottom edge 
+            user.y < cameraY + viewport.height/2 + 1000  //top edge 
         )
     })
-//*********************************** RENDER ******************************************************************** */
-     return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden",
-        position: "relative",
-        cursor: isDragging.current ? "grabbing" : "grab",
-      }}
-    >
-      {visibleUsers.map(user => {
-        const screenX =
-          user.x! - cameraX + viewport.width / 2
-        const screenY =
-          user.y! - cameraY + viewport.height / 2
+    //useEffect(() => {console.log("Visible users:", visibleUsers)}, [visibleUsers])
 
-        return (
-          <WorldUserCard
-            key={user.id}
-            user={user}
-            isExpanded={expandedUserID === user.id}
-            onExpand={() => setExpandedUserID(user.id)}
-            onCollapse={() => setExpandedUserID(null)}
-            style={{
-              position: "absolute",
-              left: screenX,
-              top: screenY,
-            }}
-          />
-        )
-      })}
-    </div>
+//*********************************** RENDER ******************************************************************** */
+    return (
+        <div style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative", cursor: isDragging.current ? "grabbing" : "grab",}}>
+            
+            {visibleUsers.map(user => {
+                const screenX = user.x! - cameraX + viewport.width / 2
+                const screenY = user.y! - cameraY + viewport.height / 2
+                return(
+                    <WorldUserCardTest key={user.id} user={user} style={{position:"absolute",left:screenX,top:screenY}}/>
+
+                )
+            })}
+        
+        </div>
     )
 
-    /*return (
-        <div>
-            {userProfiles.map(user => (
-                <WorldUserCard
-                    key={user.id}
-                    user={user}
-                    isExpanded={expandedUserID === user.id}
-                    onExpand={() => setExpandedUserID(user.id)}
-                    onCollapse={() => setExpandedUserID(null)}
-                />
-            ))}
-        </div>
-    )*/
 }
 
 export default WorldPage
