@@ -109,61 +109,19 @@ function WorldPage() {
 
         }
     }*/
+        const createUserProfiles = async () =>{
+            try{
+                const response = await api.get("/user/all")
+                const profiles = computeUserPositions(response.data,sessionSeed)
+                setUserProfiles(profiles)
 
-        const getUserProfiles = async () => {
-
-        //const BASE_RADIUS = 10000// Base radius for clustering near center
-        try {
-            const response = await api.get("/user/all")
-            const numUsers = response.data.length;
-            const BASE_RADIUS = Math.sqrt(numUsers) * 200; //This is the scaling factor for intial distance of cards from center. Scales based on number of users
-            
-            const profiles = response.data.map((user: User) => {
-
-                // Polar coordinates for clustering
-                const theta = seededRandom(user.id + sessionSeed) * 2 * Math.PI
-                const r = Math.sqrt(seededRandom(user.id + "r" + sessionSeed)) * BASE_RADIUS
-
-                const x = r * Math.cos(theta)
-                const y = r * Math.sin(theta)
-
-                return {
-                    ...user,
-                    x,
-                    y
-                }
-            })
-            //*************************************** D3-force to resolve overlap ********************************************************** */
-            
-            // Map profiles to simulation nodes
-            const nodes:ForceNode[] = profiles.map((user:User) => ({x:user.x ?? 0, y:user.y ?? 0 }))
-            
-            const CARD_WIDTH = 100; 
-            const CARD_HEIGHT = 100; 
-            const CARD_RADIUS = Math.sqrt(CARD_WIDTH ** 2 + CARD_HEIGHT ** 2) / 2 + 50; // +50 for distance between cards
-
-            
-            const simulation = forceSimulation(nodes) //this creates the simulation for the nodes
-                .force("collide", forceCollide(CARD_RADIUS)) //this is the collision force, it pushes nodes apart if nodes get closer than CARD_RADIUS
-                .force("x", forceX(0).strength(0.001)) // strength of force pulling node towards 0 on x axis -> 
-                .force("y", forceY(0).strength(0.001)) //strengh of force pulling node towards 0 on y axis
-                .stop()//Stops force simulation
-
-            for (let i = 0; i < 10; i++) simulation.tick() //runs forceSimulation variable nubmer of times -> decreaes iterations for more random distribution
-
-            // Step 3: Copy final positions back into profiles
-            nodes.forEach((node, i) => {
-                profiles[i].x = node.x
-                profiles[i].y = node.y
-            })
-            setUserProfiles(profiles)
-        } catch (err: any) {
-            console.error(err)
+            }catch(err:any){
+                console.error(err)
+            }
         }
-    }
 
 
-    useEffect(() => { getUserProfiles() }, [])
+    useEffect(() => { createUserProfiles() }, [])
     //useEffect(() => { console.log(userProfiles) }, [userProfiles])
 
 

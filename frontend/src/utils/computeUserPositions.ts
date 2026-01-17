@@ -1,5 +1,5 @@
 import { forceSimulation, forceCollide, forceX, forceY } from "d3-force";
-import type {Dump,User} from "../pages/WorldPage"
+import type {User} from "../pages/WorldPage"
 
 
 
@@ -14,35 +14,48 @@ export const seededRandom = (str: string) => {
     return (h >>> 0) / 4294967296;
 };
 
-export function computeUserPositions(users: User[], sessionSeed: string, cardSize = 100): User[] {
-    const numUsers = users.length;
-    const BASE_RADIUS = Math.sqrt(numUsers) * 200; //Scaling factor for intial distance of cards from center - scales by how many users there are
-
-    const profiles = users.map(user => { //creates the intial random positon of all the cards 
-        const theta = seededRandom(user.id + sessionSeed) * 2 * Math.PI;
-        const r = Math.sqrt(seededRandom(user.id + "r" + sessionSeed)) * BASE_RADIUS;
-        return { ...user, x: r * Math.cos(theta), y: r * Math.sin(theta) };
-    });
-
-    const nodes: ForceNode[] = profiles.map(user => ({ x: user.x!, y: user.y! })); //Creates a node for each user -> each node has the x,y coordinates of the user
-    const CARD_RADIUS = cardSize * Math.sqrt(2) + 10; 
-
-    const simulation = forceSimulation(nodes) //creates simulation with nodes 
-        .force("collide", forceCollide(CARD_RADIUS)) //creates the "force" which pushes cards apart if they are within CARD_RADIUS
-        .force("x", forceX(0).strength(0.03))//The force that pulls cards towards 0 on the x axis -> stronger force pulls cards further
-        .force("y", forceY(0).strength(0.03))//force that pulls cards towards 0 on y axis
-        .stop();
-
-    for (let i = 0; i < 100; i++) simulation.tick();//runs forceSimulation variable number of times -> more runs cards are pulled closer to eachother
-
-    nodes.forEach((node, i) => {//maps the now seperated x,y coordiantes of the nodes back to the profiles
-        profiles[i].x = node.x;
-        profiles[i].y = node.y;
-    });
-
-    return profiles;
-}
 
 
+export function computeUserPositions(users:User[],sessionSeed:string):User[]{
+    //const numUsers = users.length
+    const BASE_RADIUS = Math.sqrt(users.length) * 200
+            
+    const profiles = users.map((user:User)=>{
+        const theta = seededRandom(user.id + sessionSeed) * 2 * Math.PI
+        const r = Math.sqrt(seededRandom(user.id + "r" + sessionSeed)) * BASE_RADIUS 
 
+        const x = r * Math.cos(theta)
+        const y = r * Math.sin(theta)  
+                
+        return{
+            ...user,
+            x,
+            y
+        }
+    })
+
+
+            
+    const nodes:ForceNode[] = profiles.map((user:User) => ({x:user.x ?? 0, y:user.y ?? 0 }))
+            
+    const CARD_WIDTH = 100; 
+    const CARD_HEIGHT = 100; 
+    const CARD_RADIUS = Math.sqrt(CARD_WIDTH ** 2 + CARD_HEIGHT ** 2) / 2 + 50; // +50 for distance between cards
+
+            
+    const simulation = forceSimulation(nodes) //this creates the simulation for the nodes
+    .force("collide", forceCollide(CARD_RADIUS)) //this is the collision force, it pushes nodes apart if nodes get closer than CARD_RADIUS
+    .force("x", forceX(0).strength(0.001)) // strength of force pulling node towards 0 on x axis -> 
+    .force("y", forceY(0).strength(0.001)) //strengh of force pulling node towards 0 on y axis
+    .stop()//Stops force simulation
+
+    for (let i = 0; i < 10; i++) simulation.tick() //runs forceSimulation variable nubmer of times -> decreaes iterations for more random distribution
+
+            // Step 3: Copy final positions back into profiles
+    nodes.forEach((node, i) => {
+        profiles[i].x = node.x
+        profiles[i].y = node.y
+    })
     
+    return profiles
+}
