@@ -4,7 +4,7 @@ const api = axios.create({ //this creates an axios instance. You can now use thi
 //it will use the baseURL as the starting URL. 
   //baseURL: 'http://localhost:8000',// your backend base URL
   //baseURL: 'http://192.168.1.43:8000', 
-  baseURL: 'http://192.168.1.16:8000',
+  baseURL: import.meta.env.VITE_API_URL || 'http://192.168.1.16:8000',
 
   timeout: 5000,
   headers: { //this tells the backend that you are sending JSON

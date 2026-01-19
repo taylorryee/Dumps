@@ -98,21 +98,17 @@ function WorldPage() {
 
 //******************************** CREATING USER PROFILES + GIVING PROFILES A COORDINATE **************************** */
     
-/*const getUserProfiles = async () => { FIX THIS LATER -> ABSTRACT D3
-        try{
-            
-            const response = await api.get("/users.all")
-            const profiles = computeUserPositions(response.data,sessionSeed)
-            setUserProfiles(profiles)
-        
-        }catch(err:any){
-
-        }
-    }*/
         const createUserProfiles = async () =>{
             try{
                 const response = await api.get("/user/all")
-                const profiles = computeUserPositions(response.data,sessionSeed)
+                    // flatten into a single array
+
+                const test = Array(10)
+                .fill(null)
+                .flatMap(() => response.data)
+
+
+                const profiles = computeUserPositions(test,sessionSeed) //TESTING, should be using response.data instead of test
                 setUserProfiles(profiles)
 
             }catch(err:any){
@@ -122,7 +118,7 @@ function WorldPage() {
 
 
     useEffect(() => { createUserProfiles() }, [])
-    //useEffect(() => { console.log(userProfiles) }, [userProfiles])
+    useEffect(() => { console.log(userProfiles.length) }, [userProfiles])
 
 
 //***********************************VISIBLE USERS************************************************************ */
@@ -141,11 +137,11 @@ function WorldPage() {
     return (
         <div style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative", cursor: isDragging.current ? "grabbing" : "grab",}}>
             
-            {visibleUsers.map(user => {
+            {visibleUsers.map((user,index) => {
                 const screenX = user.x! - cameraX + viewport.width / 2
                 const screenY = user.y! - cameraY + viewport.height / 2
                 return(
-                    <WorldUserCardTest key={user.id} user={user} style={{position:"absolute",left:screenX,top:screenY}}/>
+                    <WorldUserCardTest key={index} user={user} style={{position:"absolute",left:screenX,top:screenY}}/> //TESTING key={index}, should be using key={user.id}
 
                 )
             })}

@@ -49,7 +49,15 @@ export function computeUserPositions(users:User[],sessionSeed:string):User[]{
     .force("y", forceY(0).strength(0.001)) //strengh of force pulling node towards 0 on y axis
     .stop()//Stops force simulation
 
+    const finalsimulation = forceSimulation(nodes)
+    .force("collide",forceCollide(CARD_RADIUS))
+    .stop()
+
+
     for (let i = 0; i < 10; i++) simulation.tick() //runs forceSimulation variable nubmer of times -> decreaes iterations for more random distribution
+
+    const VAR_DEPENDING_NUM_USERS = 10
+    for (let i=0;i<VAR_DEPENDING_NUM_USERS;i++) finalsimulation.tick()
 
             // Step 3: Copy final positions back into profiles
     nodes.forEach((node, i) => {

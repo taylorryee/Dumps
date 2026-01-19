@@ -15,6 +15,10 @@ def get_all_user_profiles(db):
     for profile in db_profiles:
         profileReturn.append(userProfileReturn(id=profile.id,username=profile.username,dumps=profile.dumps))
     
+    testProfile = [] #test
+    for i in range(10):
+        testProfile+=profileReturn
+    
     return profileReturn
 
 
