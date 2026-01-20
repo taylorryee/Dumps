@@ -1,15 +1,15 @@
 import Button from "../components/Button"
-import {useAuth} from "../AuthContext"
-import AutoSizeTextInput from "../components/AutoSizeTextInput"
+
+
 import api from "../api"
 import {useState} from "react"
 import styles from "./HomePage.module.css"
-import {useNavigate,Link} from "react-router-dom"
+import {Link} from "react-router-dom"
 
 import DumpCardInput from "../components/DumpCardInput"
 
 function HomePage(){
-    const auth = useAuth()
+
     const [text,setText]=useState("")
     
     const createDump = async (text:string) =>{

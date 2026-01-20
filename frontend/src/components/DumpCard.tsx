@@ -1,4 +1,4 @@
-import {useState,useCallback,useRef,useEffect,forwardRef} from "react"
+import {useState,useCallback,useRef,useEffect} from "react"
 import styles from "./DumpCard.module.css"
 
 type Dump ={

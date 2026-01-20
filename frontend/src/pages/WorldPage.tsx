@@ -2,7 +2,7 @@ import api from "../api"
 import { useState, useEffect,useRef } from "react"
 import WorldUserCardTest from "../components/WorldUserCardTest"
 import { computeUserPositions } from "../utils/computeUserPositions";
-import { forceSimulation, forceCollide, forceX, forceY } from "d3-force";
+
 
 export type Dump = {
     id: number
@@ -17,7 +17,7 @@ export type User = {
     y?: number
 }
 
-type ForceNode = { x: number; y: number; };
+
 
 export const seededRandom = (str: string) => {
     let h = 2166136261;
@@ -40,7 +40,7 @@ function WorldPage() {
  
     
  //***************************************STATE********************************************************************* */
-    const [expandedUserID, setExpandedUserID] = useState<number | null>(null)
+    //const [expandedUserID, setExpandedUserID] = useState<number | null>(null)
     const [userProfiles, setUserProfiles] = useState<User[]>([])
 
     

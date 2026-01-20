@@ -1,7 +1,7 @@
 import DumpCard from "../components/DumpCard"
 import styles from "./TimeLinePage.module.css"
 import api from "../api"
-import {useState,useEffect,useRef} from "react"
+import {useState,useEffect} from "react"
 import DumpCardInput from "../components/DumpCardInput"
 import Button from "../components/Button"
 
