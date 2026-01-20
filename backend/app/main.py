@@ -12,7 +12,7 @@ app = FastAPI()
 #this is frontend host that is allowed to talk with backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173",      "http://192.168.1.16:5173", "https://dumps-ad0p.onrender.com" ],
+    allow_origins=["http://localhost:5173",      "http://192.168.1.16:5173", "https://dumps-ad0p.onrender.com" , "https://frontend-rct4.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
