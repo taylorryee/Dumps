@@ -17,8 +17,6 @@ export type User = {
     y?: number
 }
 
-
-
 export const seededRandom = (str: string) => {
     let h = 2166136261;
     for (let i = 0; i < str.length; i++) {
@@ -27,23 +25,18 @@ export const seededRandom = (str: string) => {
     }
     return (h >>> 0) / 4294967296;
 };
+
 function WorldPage() {
 // *****************Session seed (persistent per session)*********************************************************
-    /*let sessionSeed = sessionStorage.getItem("worldSeed")
-    if (!sessionSeed) {
-        sessionSeed = Math.random().toString(36).substring(2)
-        sessionStorage.setItem("worldSeed", sessionSeed)
-    }*/
 
     const sessionSeed = Math.random().toString(36).substring(2); // new seed every refresh
 
- 
     
  //***************************************STATE********************************************************************* */
-    //const [expandedUserID, setExpandedUserID] = useState<number | null>(null)
+    const [expandedUserID, setExpandedUserID] = useState<number | null>(null)
+    
     const [userProfiles, setUserProfiles] = useState<User[]>([])
 
-    
     const [cameraX, setCameraX] = useState(0) // x,y coordinate of center of camera 
     const [cameraY, setCameraY] = useState(0)
 
@@ -133,20 +126,33 @@ function WorldPage() {
     })
     //useEffect(() => {console.log("Visible users:", visibleUsers)}, [visibleUsers])
 
+    
+
 //*********************************** RENDER ******************************************************************** */
     return (
-        <div style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative", cursor: isDragging.current ? "grabbing" : "grab",}}>
+        <>
+        <div style={{ width: "100vw", height: "100vh", overflow: "hidden", position: "relative", cursor: isDragging.current ? "grabbing" : "grab", filter: expandedUserID !== null ? "blur(6px)" : "none",
+        transition: "filter 0.2s ease",}}>
             
             {visibleUsers.map((user,index) => {
                 const screenX = user.x! - cameraX + viewport.width / 2
                 const screenY = user.y! - cameraY + viewport.height / 2
                 return(
-                    <WorldUserCardTest key={index} user={user} style={{position:"absolute",left:screenX,top:screenY}}/> //TESTING key={index}, should be using key={user.id}
+                    <WorldUserCardTest key={index} user={user} style={{position:"absolute",left:screenX,top:screenY}} onClick={()=>setExpandedUserID(user.id)}/> //TESTING key={index}, should be using key={user.id}
 
                 )
             })}
-        
         </div>
+
+    
+        {expandedUserID !== null && (
+                <div onClick={() => setExpandedUserID(null)} style={{position: "fixed",inset: 0,background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,}}>
+                    <WorldUserCardTest user={userProfiles.find(u => u.id === expandedUserID)!} style={{}} onClick={() => {}}/>
+                </div>
+        )}
+
+
+        </>
     )
 
 }

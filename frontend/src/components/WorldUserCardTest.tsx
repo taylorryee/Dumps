@@ -12,10 +12,12 @@ type User={
 type Props={
     user:User
     style:React.CSSProperties
+    onClick:()=>void
+
 }
 
 
-function WorldUserCardTest({user,style}:Props){
+function WorldUserCardTest({user,style,onClick}:Props){
 
     return(
         <div style = {{...style,         border: "1px solid #ccc", // border around the card
@@ -27,10 +29,12 @@ function WorldUserCardTest({user,style}:Props){
         height:"100px",
         maxHeight:"100px",
         maxWidth: "100px",        // optional: constrain width
-        }}>
+        }} onClick={onClick}>
+            
             <h1 style={{ margin: 0, fontSize: "16px" }}>
                 {user.dumps[0]?user.dumps[0].text:"no dumps"}
             </h1>
+        
         </div>
     )
 
