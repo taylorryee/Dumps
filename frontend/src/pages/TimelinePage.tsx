@@ -17,11 +17,11 @@ type Dump = {
 
 function TimelinePage(){
 
-
+//************************************** STATE ******************************************************************** */
     const [dumps,setDumps] = useState<Dump[]>([])
-        
     const [text,setText] = useState("")
 
+//*************************************** BACKGROUND COLOR **************************************************** */
     const colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99"]; // example palette
     const getColorForDate = (date: string) => {
         const hash = date.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -34,8 +34,9 @@ function TimelinePage(){
             color: getColorForDate(new Date(dump.created_at).toLocaleDateString())
         }));
         setDumps(coloredDumps)
-
     }
+
+    //*********************************** API CALLS ************************************************************* */
     const getDumps = async () => {
         try{
             const response = await api.get("/dump/all")
@@ -66,11 +67,7 @@ function TimelinePage(){
         }
     }
     
-
-
-
     useEffect(()=>{getDumps()},[])
-
 
     return(
             <div className ={styles.timelineWrapper}> 

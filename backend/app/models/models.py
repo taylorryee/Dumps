@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,ForeignKey,DateTime
+from sqlalchemy import Column,Integer,String,ForeignKey,DateTime,Date
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db import Base
@@ -18,6 +18,8 @@ class User(Base):
     dumps = relationship("Dump",back_populates="user")
 
     categories = relationship("Category",secondary = "users_categories", back_populates="users")
+
+
 
 
 class Dump(Base): #intial thought dump
@@ -67,6 +69,12 @@ class Category(Base):#global table of categories
 
     users = relationship("User",secondary="users_categories",back_populates="categories")
 
+
+class DailyPair(Base):
+    __tablename__ = "daily_pairs"
+    date = Column(Date, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True, index=True)
+    paired_user_id = Column(Integer, ForeignKey("users.id"), index=True)
 
 
 

@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session,joinedload
 from sqlalchemy.exc import IntegrityError
+from datetime import date
 from app.models.models import User
 from app.schemas.userSchema import userCreate,userCreateReturn,userLogin,userLoginReturn,userProfileReturn
 from coolname import generate_slug
-from app.models.models import Dump, Thought,Category,User
+from app.models.models import Dump, Thought,Category,User,DailyPair
 from app.security.auth import hash_password,verify_password,create_access_token
 
 
@@ -60,3 +61,9 @@ def get_user_profile(user:User,db:Session):
     return userProfileReturn(id=user.id, username=user.username, dumps = dumps)
 
 
+def get_daily_pair(user:User,db:Session):
+    pair = db.query(User).join(DailyPair,DailyPair.paired_user_id==User.id).filter(DailyPair.user_id==user.id).filter(DailyPair.date==date.today()).first()
+    if not pair:
+        return None
+    return pair
+    

@@ -9,11 +9,12 @@ from app.schemas.thoughtSchema import thoughtCreate,thoughtReturn
 from app.schemas.categorySchema import categoryCreate,categoryReturn
 from app.schemas.userSchema import userCreate,userCreateReturn,userLogin,userLoginReturn,userProfileReturn
 
+
 from app.services import userServices as service
 from app.celery_app import celery_app
 
 from app.security.auth import get_current_user
-from app.models.models import Dump, Thought,Category,User
+from app.models.models import Dump, Thought,Category,User,DailyPair
 
 #CRUD - Create-Post, Read-Get
 router = APIRouter(prefix="/user",tags=["User Routes"])
@@ -53,5 +54,18 @@ def get_user_profile(user=Depends(get_current_user),db:Session=Depends(get_db)):
         raise HTTPException()
 
     return user_profile
+
+@router.get("/pair",response_model=userProfileReturn)
+def get_daily_pair(user=Depends(get_current_user),db:Session=Depends(get_db)):
+    pair = service.get_daily_pair(user,db)
+    if not pair:
+        raise HTTPException()
+
+    return pair
+
+
+@router.get("/pairTable",)
+def test_pairs(db:Session=Depends(get_db)):
+    return db.query(DailyPair).all()
 
 

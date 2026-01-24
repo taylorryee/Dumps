@@ -1,9 +1,11 @@
 from app.celery_app import celery_app
 from sqlalchemy.orm import Session
 from app.db import SessionLocal
-from app.models.models import Dump,Thought,Category,ThoughtCategory,User,UserCategory
+from app.models.models import Dump,Thought,Category,ThoughtCategory,User,UserCategory,DailyPair
 from sqlalchemy import asc,func
 from app.llm.services_llm import summarize_text, extract_thoughts,extract_categories,embed_categories
+import random
+from datetime import date
 
 #user categories is subset of global categories
 
@@ -88,5 +90,49 @@ def process_dump(dump_id: int, user_id:int):
     return True
 
 
+@celery_app.task
+def pair_users():
+    db = SessionLocal()
+    today = date.today()
+    completed = db.query(DailyPair).filter(DailyPair.date==today).first()
+    if completed:
+        return
+    
+    rng = random.Random(date.today().toordinal())
+    all_user_ids = [uid for (uid,) in db.query(User).with_entities(User.id).all()] #with_entities allows you to only load specific columns instead of whole model, we also have to convert the db object 
+    #only the user id because it with autaomticly give you tuples because it represnts a row. 
+    rng.shuffle(all_user_ids)
 
+    pairs = []
+    try:
+        
+        if len(all_user_ids)%2 !=0:
+            for i in range(0,len(all_user_ids)-1,2):
+                pairUno = DailyPair(date=today,user_id=all_user_ids[i],paired_user_id=all_user_ids[i+1])
+                pairDos = DailyPair(date=today,user_id=all_user_ids[i+1],paired_user_id=all_user_ids[i])
+                pairs.append(pairUno)
+                pairs.append(pairDos)
+            oddPair = DailyPair(date=today,user_id=all_user_ids[-1],paired_user_id=all_user_ids[0])
+            pairs.append(oddPair)
+
+        else:
+            for i in range(0,len(all_user_ids),2):
+                pairUno = DailyPair(date=today,user_id=all_user_ids[i],paired_user_id=all_user_ids[i+1])
+                pairDos = DailyPair(date=today,user_id=all_user_ids[i+1],paired_user_id=all_user_ids[i])
+                pairs.append(pairUno)
+                pairs.append(pairDos)
+        
+        db.add_all(pairs)
+        db.commit()
+        return True
+    
+    except:
+        db.rollback()
+        raise
+    
+    finally:
+        db.close()
+
+
+    
 

@@ -1,5 +1,5 @@
 from celery import Celery
-
+from celery.schedules import crontab
 
 celery_app = Celery(
     "brain_dump",
@@ -9,8 +9,17 @@ celery_app = Celery(
 
 
 
+celery_app.conf.timezone = "UTC"
+celery_app.conf.enable_utc = True
 
-#celery_app.autodiscover_tasks(["app"])
+celery_app.conf.beat_schedule = {
+    "pair-users-every-day": {
+        "task": "app.worker.tasks.pair_users",
+        "schedule": crontab(minute="*"),  # midnight UTC
+    },
+}
+
+
 
 from app.worker import tasks
 
