@@ -157,4 +157,4 @@ function WorldPage() {
 
 }
 
-export default WorldPage
+export default WorldPage;

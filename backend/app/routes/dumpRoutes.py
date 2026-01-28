@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Depends,HTTPException
+from fastapi import APIRouter,Depends,HTTPException,WebSocket
 from sqlalchemy.orm import Session
 from datetime import date
 from typing import List
@@ -63,8 +63,29 @@ def get_user_daily_dumps(user=Depends(get_current_user),db:Session=Depends(get_d
     
     return todays_dumps
 
+@router.get("/pairDumps",response_model=List[dumpReturn])
+def get_pair_dumps(user=Depends(get_current_user),db:Session=Depends(get_db)):
+    pair_dumps = service.get_pair_dumps(user,db)
+    return pair_dumps
 
 
+connections = {}
+
+@router.websocket("/ws/timeline/{timeline_id}")
+async def timeline_ws(ws: WebSocket, timeline_id: str):
+    await ws.accept()
+    if timeline_id not in connections:
+        connections[timeline_id] = []
+    connections[timeline_id].append(ws)
+
+    try:
+        while True:
+            data = await ws.receive_text()
+            await service.ws_update_pair(timeline_id, data)
+            for conn in connections[timeline_id]:
+                await conn.send_text(data)
+    except:
+        connections[timeline_id].remove(ws)
 
 
 

@@ -1,11 +1,13 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from datetime import date
 
-from app.models.models import Dump, Thought,Category,User
+from app.models.models import Dump, Thought,Category,User,DailyPair
 from app.schemas.dumpSchema import dumpCreate,dumpReturn
 from app.worker.tasks import process_dump
+
+
 
 
 def create_dump(new_dump:dumpCreate,user:User,db:Session):
@@ -48,5 +50,13 @@ def get_user_daily_dumps(user:User,db:Session):
     today = date.today()
     todays_dumps = db.query(Dump).filter(Dump.user_id==user.id).filter(func.date(Dump.created_at)==today).all()
     return todays_dumps
+
+
+def get_pair_dumps(user:User,db:Session):
+    today =date.today()
+    pair = db.query(User).join(DailyPair,DailyPair.paired_user_id==User.id).options(joinedload(User.dumps)).filter(DailyPair.date==today).filter(DailyPair.user_id==user.id).first()
+    #.options lets you tell sqlalchemy how to load relationships - in this instance we are pre loading the dumps relationship. joinedload loads the relationship in one query. Also here
+    # we use an explicit join condition "(DailyPair,DailyPair.paired_user_id==User.id)" which specifies to join rows only on this condition - in our case were the paired_user_id==User.id
+    return pair.dumps
 
 

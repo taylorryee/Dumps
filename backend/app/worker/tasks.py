@@ -108,19 +108,28 @@ def pair_users():
         
         if len(all_user_ids)%2 !=0:
             for i in range(0,len(all_user_ids)-1,2):
-                pairUno = DailyPair(date=today,user_id=all_user_ids[i],paired_user_id=all_user_ids[i+1])
-                pairDos = DailyPair(date=today,user_id=all_user_ids[i+1],paired_user_id=all_user_ids[i])
-                pairs.append(pairUno)
-                pairs.append(pairDos)
-            oddPair = DailyPair(date=today,user_id=all_user_ids[-1],paired_user_id=all_user_ids[0])
+                low,high = min(all_user_ids[i],all_user_ids[i+1]),max(all_user_ids[i],all_user_ids[i+1])
+                pair = DailyPair(date=today,user_id_low=low,user_id_high=high)
+                pairs.append(pair)
+                
+                #pairUno = DailyPair(date=today,user_id=all_user_ids[i],paired_user_id=all_user_ids[i+1])
+                #pairDos = DailyPair(date=today,user_id=all_user_ids[i+1],paired_user_id=all_user_ids[i])
+                #pairs.append(pairUno)
+                #pairs.append(pairDos)
+            low,high = min(all_user_ids[0],all_user_ids[-1]),max(all_user_ids[0],all_user_ids[-1])
+            oddPair = DailyPair(date=today,user_id_low=low,user_id_high=high)
+            #oddPair = DailyPair(date=today,user_id=all_user_ids[-1],paired_user_id=all_user_ids[0])
             pairs.append(oddPair)
 
         else:
             for i in range(0,len(all_user_ids),2):
-                pairUno = DailyPair(date=today,user_id=all_user_ids[i],paired_user_id=all_user_ids[i+1])
-                pairDos = DailyPair(date=today,user_id=all_user_ids[i+1],paired_user_id=all_user_ids[i])
-                pairs.append(pairUno)
-                pairs.append(pairDos)
+                low,high = min(all_user_ids[i],all_user_ids[i+1]),max(all_user_ids[i],all_user_ids[i+1])
+                pair = DailyPair(date=today,user_id_low=low,user_id_high=high)
+                pairs.append(pair)
+                #pairUno = DailyPair(date=today,user_id=all_user_ids[i],paired_user_id=all_user_ids[i+1])
+                #pairDos = DailyPair(date=today,user_id=all_user_ids[i+1],paired_user_id=all_user_ids[i])
+                #pairs.append(pairUno)
+                #pairs.append(pairDos)
         
         db.add_all(pairs)
         db.commit()

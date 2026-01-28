@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session,joinedload
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import or_,case,and_
 from datetime import date
 from app.models.models import User
 from app.schemas.userSchema import userCreate,userCreateReturn,userLogin,userLoginReturn,userProfileReturn
@@ -61,9 +62,28 @@ def get_user_profile(user:User,db:Session):
     return userProfileReturn(id=user.id, username=user.username, dumps = dumps)
 
 
-def get_daily_pair(user:User,db:Session):
-    pair = db.query(User).join(DailyPair,DailyPair.paired_user_id==User.id).filter(DailyPair.user_id==user.id).filter(DailyPair.date==date.today()).first()
-    if not pair:
-        return None
-    return pair
+def get_daily_pair(user:int,db:Session):
+    #pair_id = case(
+     #   [(DailyPair.user_id_low==user.id,DailyPair.user_id_high),(DailyPair.user_id_high==user.id,DailyPair.user_id_low)]
+    #)
+    
+    #pair = db.query(User).join(DailyPair,and_(DailyPair.date==date.today(),or_(DailyPair.user_id_high==user,DailyPair.user_id_low==user))).filter(and_(User.id!=user),or_(User.id==DailyPair.user_id_low,User.id==DailyPair.user_id_high)).first()
+
+    daily_pair = db.query(DailyPair).filter(DailyPair.date==date.today(),or_(DailyPair.user_id_high==user,DailyPair.user_id_low==user)).first()
+    
+    if daily_pair.user_id_low==user:
+        pair_id = daily_pair.user_id_high
+    else:
+        pair_id=daily_pair.user_id_low
+    
+    #return db.query(User).filter(User.id==pair_id).first()
+    return db.query(User).get(pair_id)
+
+
+    #return pair
+    
+
+
+
+
     

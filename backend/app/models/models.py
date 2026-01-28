@@ -1,4 +1,4 @@
-from sqlalchemy import Column,Integer,String,ForeignKey,DateTime,Date
+from sqlalchemy import Column,Integer,String,ForeignKey,DateTime,Date,UniqueConstraint
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db import Base
@@ -72,11 +72,19 @@ class Category(Base):#global table of categories
 
 class DailyPair(Base):
     __tablename__ = "daily_pairs"
-    date = Column(Date, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True, index=True)
-    paired_user_id = Column(Integer, ForeignKey("users.id"), index=True)
-
-
+    id = Column(Integer,primary_key=True)
+    date = Column(Date,index=True)
+    user_id_low = Column(Integer,ForeignKey("users.id"),index=True)
+    user_id_high = Column(Integer, ForeignKey("users.id"), index=True)
+    __table_args__ = (
+        UniqueConstraint("date", "user_id_low", "user_id_high"), # __table_args__ is used to define table-level rules. Here we use a UniqueConstraint to ensure that
+# each combination of date, user_id, and paired_user_id is unique.
+# This is different from using composite primary keys because primary keys define the sole identity of a row.
+# Composite primary keys work for pure join tables where the combination of columns IS the identity.
+# In this case, however, the combination of date, user_id, and paired_user_id is a business rule for uniqueness,
+# not the row’s identity. We need a separate id for row identity (e.g., for WebSocket connections and references),
+# so using a surrogate primary key plus a UniqueConstraint is the correct approach.
+    )
 
 
 ######################################## JOIN TABLES ############################################################
