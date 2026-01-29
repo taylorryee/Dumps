@@ -29,6 +29,7 @@ class userProfileReturn(BaseModel):
     id:int
     username:str
     dumps:List[dumpReturn]
+    timeline_id:int
     class Config:
         from_attributes=True
     

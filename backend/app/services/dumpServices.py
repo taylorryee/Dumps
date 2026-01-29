@@ -6,8 +6,9 @@ from datetime import date
 from app.models.models import Dump, Thought,Category,User,DailyPair
 from app.schemas.dumpSchema import dumpCreate,dumpReturn
 from app.worker.tasks import process_dump
+from app.db import SessionLocal
 
-
+from sqlalchemy.orm import Session
 
 
 def create_dump(new_dump:dumpCreate,user:User,db:Session):
@@ -58,5 +59,19 @@ def get_pair_dumps(user:User,db:Session):
     #.options lets you tell sqlalchemy how to load relationships - in this instance we are pre loading the dumps relationship. joinedload loads the relationship in one query. Also here
     # we use an explicit join condition "(DailyPair,DailyPair.paired_user_id==User.id)" which specifies to join rows only on this condition - in our case were the paired_user_id==User.id
     return pair.dumps
+
+
+def ws_update_pair(timeline_id:int,dump:str,user:User):
+    db:Session = SessionLocal()
+    newDump = Dump(text=dump,user_id=user.id)
+    try:
+        db.add(newDump)
+        db.commit()
+    except:
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
 
 

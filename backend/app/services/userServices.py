@@ -77,7 +77,8 @@ def get_daily_pair(user:int,db:Session):
         pair_id=daily_pair.user_id_low
     
     #return db.query(User).filter(User.id==pair_id).first()
-    return db.query(User).get(pair_id)
+    pair_user =  db.query(User).get(pair_id)
+    return userProfileReturn(id=pair_user.id,username=pair_user.username,dumps=pair_user.dumps,timeline_id=daily_pair.id)
 
 
     #return pair

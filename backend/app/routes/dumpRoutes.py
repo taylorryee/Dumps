@@ -12,7 +12,7 @@ from app.services import dumpServices as service
 from app.celery_app import celery_app
 
 from app.security.auth import get_current_user
-
+from starlette.concurrency import run_in_threadpool
 
 
 router = APIRouter(prefix = "/dump",tags=["Dump Routes"])
@@ -72,7 +72,7 @@ def get_pair_dumps(user=Depends(get_current_user),db:Session=Depends(get_db)):
 connections = {}
 
 @router.websocket("/ws/timeline/{timeline_id}")
-async def timeline_ws(ws: WebSocket, timeline_id: str):
+async def timeline_ws(ws: WebSocket, timeline_id: str,user=Depends(get_current_user)):
     await ws.accept()
     if timeline_id not in connections:
         connections[timeline_id] = []
@@ -80,12 +80,15 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
 
     try:
         while True:
-            data = await ws.receive_text()
-            await service.ws_update_pair(timeline_id, data)
+            dump = await ws.receive_text()
+            await run_in_threadpool(service.ws_update_pair(timeline_id, dump,user)) #We use run_in_threadpool here so that we can pass of the sync work of update_pair to another thread.
+            #This ensures that the event loop is not blocked while sync work is happening in the threadpool thread.
             for conn in connections[timeline_id]:
-                await conn.send_text(data)
+                await conn.send_text(dump)
     except:
         connections[timeline_id].remove(ws)
+        if connections[timeline_id] == []:
+            del connections[timeline_id]
 
 
 

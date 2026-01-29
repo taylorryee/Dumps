@@ -15,7 +15,7 @@ celery_app.conf.enable_utc = True
 celery_app.conf.beat_schedule = {
     "pair-users-every-day": {
         "task": "app.worker.tasks.pair_users",
-        "schedule": crontab(minute="*",hour="*"),  # midnight UTC
+        "schedule": crontab(minute="0",hour="0"),  # midnight UTC
     },
 }
 
