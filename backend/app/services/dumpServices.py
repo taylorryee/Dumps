@@ -61,9 +61,10 @@ def get_pair_dumps(user:User,db:Session):
     return pair.dumps
 
 
-def ws_update_pair(timeline_id:int,dump:str,user:User):
+def ws_update_pair(timeline_id:int,dumpData:Dump,user_id:int):
     db:Session = SessionLocal()
-    newDump = Dump(text=dump,user_id=user.id)
+    user = db.query(User).get(user_id)
+    newDump = Dump(text=dumpData.dump,user_id=user.id,created_at=dumpData.created_at)
     try:
         db.add(newDump)
         db.commit()

@@ -62,16 +62,16 @@ def get_user_profile(user:User,db:Session):
     return userProfileReturn(id=user.id, username=user.username, dumps = dumps)
 
 
-def get_daily_pair(user:int,db:Session):
+def get_daily_pair(user:User,db:Session):
     #pair_id = case(
      #   [(DailyPair.user_id_low==user.id,DailyPair.user_id_high),(DailyPair.user_id_high==user.id,DailyPair.user_id_low)]
     #)
     
     #pair = db.query(User).join(DailyPair,and_(DailyPair.date==date.today(),or_(DailyPair.user_id_high==user,DailyPair.user_id_low==user))).filter(and_(User.id!=user),or_(User.id==DailyPair.user_id_low,User.id==DailyPair.user_id_high)).first()
 
-    daily_pair = db.query(DailyPair).filter(DailyPair.date==date.today(),or_(DailyPair.user_id_high==user,DailyPair.user_id_low==user)).first()
+    daily_pair = db.query(DailyPair).filter(DailyPair.date==date.today(),or_(DailyPair.user_id_high==user.id,DailyPair.user_id_low==user.id)).first()
     
-    if daily_pair.user_id_low==user:
+    if daily_pair.user_id_low==user.id:
         pair_id = daily_pair.user_id_high
     else:
         pair_id=daily_pair.user_id_low

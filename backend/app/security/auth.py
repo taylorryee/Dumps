@@ -51,13 +51,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None): 
 # -----------------------------
 # Get current user dependency
 # -----------------------------
-
-def get_current_user(authorization:Optional[str]=Header(None), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
+credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
+def get_current_user(authorization:Optional[str]=Header(None), db: Session = Depends(get_db)):
+
     print("AUTH HEADER:", authorization)
 
     if authorization is None or not authorization.startswith("Bearer "):
@@ -79,8 +80,15 @@ def get_current_user(authorization:Optional[str]=Header(None), db: Session = Dep
         raise credentials_exception
     return user
 
+def decode_token(token:str):#using this for websocket since they dont send jwt in header like http
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        id = int(payload.get("sub"))
+        if id is None:
+            raise credentials_exception
+        return id
+    
+    except JWTError:
+        raise credentials_exception
 
-#So now if i want to protect a route I just do this:
-#@router.get("/players/private")
-#def my_team(current_user = Depends(get_current_user)): Now i just pass a dependancy into the route i want protected
-    #return {"team": current_user.team_name}
+

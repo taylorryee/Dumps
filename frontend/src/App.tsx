@@ -19,7 +19,7 @@ function App(){
         <Route path ="mind" element={<ProtectedRoute><MindPage/></ProtectedRoute>}/>
         <Route path="timeline" element={<ProtectedRoute><TimelinePage/></ProtectedRoute>}/>
         <Route path="/world" element={<ProtectedRoute><WorldPage/></ProtectedRoute>}/>
-        <Route path="/dailyPair" element={<ProtectedRoute><DailyPairPage/></ProtectedRoute>}/>
+        <Route path="/pair" element={<ProtectedRoute><DailyPairPage/></ProtectedRoute>}/>
       </Routes>
     </div>
 

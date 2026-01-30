@@ -56,7 +56,7 @@ def get_user_profile(user=Depends(get_current_user),db:Session=Depends(get_db)):
     return user_profile
 
 @router.get("/pair",response_model=userProfileReturn)
-def get_daily_pair(user:int,db:Session=Depends(get_db)):
+def get_daily_pair(user=Depends(get_current_user),db:Session=Depends(get_db)):
     pair = service.get_daily_pair(user,db)
     if not pair:
         raise HTTPException()
@@ -66,6 +66,9 @@ def get_daily_pair(user:int,db:Session=Depends(get_db)):
 
 @router.get("/pairTable",)
 def test_pairs(db:Session=Depends(get_db)):
-    return db.query(DailyPair).all()
+
+    pairs = db.query(DailyPair).all()
+    return pairs
+
 
 
