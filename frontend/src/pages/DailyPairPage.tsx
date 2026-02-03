@@ -1,8 +1,10 @@
 import {useState,useEffect,useRef} from "react"
 import api from "../api"
-
+import styles from "./DailyPairPage.module.css"
+import Timeline from "../components/Timeline"
 type Dump = {
     id:number
+    user_id:number
     created_at:string
     text:string
 
@@ -10,8 +12,12 @@ type Dump = {
 
 function DailyPairPage(){
 
+//#################################STATE#######################################################
     const [yourDumps,setYourDumps] = useState<Dump[]>([])
     const [pairDumps,setPairDumps] = useState<Dump[]>([])
+
+    const [text,setText] = useState("")
+    
     const [timelineID,setTimelineID] = useState(0)
     const [pairID,setPairID]=useState(0)
 
@@ -29,12 +35,15 @@ function DailyPairPage(){
 
             setTimelineID(pairData.data.timeline_id)
 
+
         }catch(err:any){
             console.error(err)
         }
     }
     useEffect(()=>{getDumps()},[])
-
+    useEffect(()=>{console.log(timelineID,"timelineID")},[timelineID])
+        useEffect(()=>{console.log(pairID,"pairID")},[timelineID])
+    
     useEffect(()=>{
         if(timelineID==0)return;
 
@@ -54,11 +63,18 @@ function DailyPairPage(){
 
         ws.onmessage = (e) => {
             const data = JSON.parse(e.data)
+            console.log("RECEIVED:", data);
+            const newDump:Dump={
+                id:data.id,
+                user_id:data.user_id,
+                created_at:data.created_at,
+                text:data.dump
+            }
             if(data.user_id==pairID){
-                setYourDumps((prev)=>[...prev,data.dump])
+                setPairDumps((prev)=>[...prev,newDump])
             }
             else{
-                setPairDumps((prev)=>[...prev,data.dump])
+                setYourDumps((prev)=>[...prev,newDump])
             }
         };
 
@@ -80,7 +96,11 @@ function DailyPairPage(){
     
     return(
         <div>
+            <div className = {styles.pairTimeline}>
+                <Timeline dumps={yourDumps} />
+                <button onClick={()=>sendMessage("hello my ball")}/>
 
+            </div>
         </div>
     );
 }

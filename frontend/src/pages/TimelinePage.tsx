@@ -70,6 +70,7 @@ function TimelinePage(){
     useEffect(()=>{getDumps()},[])
 
     return(
+
             <div className ={styles.timelineWrapper}> 
  
                 <div className={styles.timelineCardSpacer} style = {{backgroundColor:"#358792",height:"100vh"}}/> 
@@ -100,7 +101,9 @@ function TimelinePage(){
                     ))}
                 </div>
 
-            </div>      
+   
+            
+            </div>
     );
 }
 

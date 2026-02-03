@@ -1,0 +1,15 @@
+
+.pairTimeline {
+  display: flex;
+  flex-direction: column;  /* stack top and bottom */
+  height: 100vh;           /* full viewport height */
+  overflow-y: auto;        /* scroll the whole container together */
+  gap: 0.5rem;             /* optional spacing between timelines */
+}
+
+.pairTimeline > * {
+  height:50vh ;              /* each timeline takes equal space */
+  overflow-y: auto;        /* enable vertical scroll for this child */
+  /* optional: add padding to avoid content touching edges */
+  padding: 0.5rem;
+}

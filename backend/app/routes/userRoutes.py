@@ -15,6 +15,7 @@ from app.celery_app import celery_app
 
 from app.security.auth import get_current_user
 from app.models.models import Dump, Thought,Category,User,DailyPair
+from app.security.auth import hash_password,verify_password,create_access_token
 
 #CRUD - Create-Post, Read-Get
 router = APIRouter(prefix="/user",tags=["User Routes"])
@@ -68,7 +69,16 @@ def get_daily_pair(user=Depends(get_current_user),db:Session=Depends(get_db)):
 def test_pairs(db:Session=Depends(get_db)):
 
     pairs = db.query(DailyPair).all()
+
+
     return pairs
+@router.get("/test")
+def test(user_id,db:Session=Depends(get_db)):
+    cur_user = db.query(User).get(user_id)
+    
+    data = {"sub":str(cur_user.id)}
+    token = create_access_token(data)
+    return userLoginReturn(id = cur_user.id, username = cur_user.username,token=token)
 
 
 

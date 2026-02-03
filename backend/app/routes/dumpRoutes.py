@@ -52,8 +52,7 @@ def get_category(category_id:int,db:Session=Depends(get_db)):
 @router.get("/all",response_model=List[dumpReturn])
 def get_all_dumps(user=Depends(get_current_user),db:Session=Depends(get_db)):
     all_dumps = service.get_all_dumps(user,db)
-    if not all_dumps:
-        raise HTTPException(status_code=404)
+
     return all_dumps
 
 
@@ -67,6 +66,12 @@ def get_user_daily_dumps(user=Depends(get_current_user),db:Session=Depends(get_d
 def get_pair_dumps(user=Depends(get_current_user),db:Session=Depends(get_db)):
     pair_dumps = service.get_pair_dumps(user,db)
     return pair_dumps
+
+def log_connections():
+    snapshot =[]
+    for key,item in connections.items():
+        snapshot.append((key,item))
+    print("WS CONNECTIONS:", snapshot,flush=True)
 
 
 connections = {}#TO DO: Need to switch this to redis - currently this assumes that all websocket requests get sent to the same worker as connections is local to one worker instance. Need a global
@@ -82,29 +87,37 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
         await ws.close(code=1008)
         return
     await ws.accept()
-    
+
     if timeline_id not in connections:
+
         connections[timeline_id] = []
     connections[timeline_id].append(ws)
+    log_connections()
 
     try:
         while True:
+            print("sup twin",flush=True)
             dump = await ws.receive_text()
             dumpData = json.loads(dump)
 
-            await run_in_threadpool(service.ws_update_pair,timeline_id, dumpData,user_id) #We use run_in_threadpool here so that we can pass of the sync work of update_pair to another thread.
+
+            db_accurate_dump = await run_in_threadpool(service.ws_update_pair,timeline_id, dumpData,user_id) #We use run_in_threadpool here so that we can pass of the sync work of update_pair to another thread.
             #This ensures that the event loop is not blocked while sync work is happening in the threadpool thread.
             for conn in connections[timeline_id]:
                 await conn.send_text(json.dumps({
-                    "user_id":user_id,
-                    "dump":dumpData.dump,
-                    "created_at":dumpData.created_at,
+                    "id":db_accurate_dump.id,
+                    "user_id":db_accurate_dump.user_id,
+                    "dump":db_accurate_dump.text,
+                    "created_at":dumpData["created_at"]
 
                 }))
-    except:
+    except Exception as e:
+        print("WS ERROR:", type(e), e, flush=True)
         connections[timeline_id].remove(ws)
         if connections[timeline_id] == []:
             del connections[timeline_id]
+ 
+        log_connections()
 
 
 

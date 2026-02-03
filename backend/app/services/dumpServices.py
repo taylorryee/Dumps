@@ -63,16 +63,19 @@ def get_pair_dumps(user:User,db:Session):
 
 def ws_update_pair(timeline_id:int,dumpData:Dump,user_id:int):
     db:Session = SessionLocal()
-    user = db.query(User).get(user_id)
-    newDump = Dump(text=dumpData.dump,user_id=user.id,created_at=dumpData.created_at)
+   # user = db.query(User).get(user_id)
+    newDump = Dump(text=dumpData["dump"],user_id=user_id,created_at=dumpData["created_at"])
     try:
         db.add(newDump)
         db.commit()
+        db.refresh(newDump)
+        return newDump
     except:
         db.rollback()
         raise
     finally:
         db.close()
+
 
 
 

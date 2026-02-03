@@ -1,27 +1,40 @@
+.timelineWrapper {
+    display: flex;
+    flex-direction: row-reverse;
+
+    align-items: center;
+    gap: 0.5rem;
+
+    overflow-x: auto;      /* this controls scroll*/
+    overflow-y: hidden;
+
+    width: 100%;
+
+}
+
 
 .timelineCardContainer{
     display: flex; 
     flex-direction:row-reverse;
     gap:0.5rem;
-
-    height:100vh;
     align-items: center;
 
-    overflow:visible;
-
-
-
 
 }
 
-.timelineCardContainer > *{ 
-    flex:0 0 auto;
+
+.cardDate{
+    display:flex;
+    flex-direction:column;
+    gap:0rem;
+    align-items:center;
+    z-index:1
 
 }
+
 
 .timelineCardSpacer{
     flex:0 0 40vw;
-
 
 }
 
@@ -37,31 +50,6 @@
 }
 
 
-
-.cardDate{
-    display:flex;
-    flex-direction:column;
-    gap:0rem;
-    align-items:center;
-    z-index:1
-
-}
-
-
-
-.timelineWrapper {
-    display: flex;
-    flex-direction: row-reverse;
-
-    align-items: center;
-    gap: 0.5rem;
-
-    overflow-x: auto;      /* this controls scroll*/
-    overflow-y: hidden;
-
-    width: 100%;
-    
-}
 
 .colorWrapper {
     display: flex;
@@ -79,3 +67,18 @@
 }
 
 
+.halfdat {
+    height: 100vh;
+    overflow: hidden;
+
+        display: flex;
+    flex-direction: row; /* flex rows */
+    align-items:flex-start
+}
+
+.halfdat > * {
+    transform: scale(0.5);
+    transform-origin: top center;
+    width: 200%; /* compensate for scaling */
+    flex-shrink:0
+}
