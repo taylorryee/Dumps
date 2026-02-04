@@ -104,7 +104,7 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
             db_accurate_dump = await run_in_threadpool(service.ws_update_pair,timeline_id, dumpData,user_id) #We use run_in_threadpool here so that we can pass of the sync work of update_pair to another thread.
             #This ensures that the event loop is not blocked while sync work is happening in the threadpool thread.
             for conn in connections[timeline_id]:
-                await conn.send_text(json.dumps({
+                await conn.send_text(json.dump({
                     "id":db_accurate_dump.id,
                     "user_id":db_accurate_dump.user_id,
                     "dump":db_accurate_dump.text,
