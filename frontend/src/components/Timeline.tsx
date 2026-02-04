@@ -1,5 +1,5 @@
 import DumpCard from "../components/DumpCard"
-import styles from "../pages/TimelinePage.module.css"
+import styles from "../components/Timeline.module.css"
 
 import DumpCardInput from "../components/DumpCardInput"
 import Button from "../components/Button"

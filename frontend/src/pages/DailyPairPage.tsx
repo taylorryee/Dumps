@@ -98,7 +98,8 @@ function DailyPairPage(){
         <div>
             <div className = {styles.pairTimeline}>
                 <Timeline dumps={pairDumps} />
-                <button onClick={()=>sendMessage("hello my ball")}/>
+                <Timeline dumps={yourDumps} text={text} setText={setText} sendMessage={()=>sendMessage(text)}/>
+    
 
             </div>
         </div>
