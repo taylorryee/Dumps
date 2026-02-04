@@ -99,25 +99,29 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
         return
     await ws.accept()
     
-    global_connections.hset(timeline_id,mapping={user_id:1})
-    user_ws[user_id] = ws
+    global_connections.hset(str(timeline_id),mapping={str(user_id):'1'}) #Here I am creating a redis Hash - a hash in redis stores things by key->{field:val}, its like a dictionary of dictionarys.
+    #Specifycing string is not neccessary as Redis will acutomatily convert - but just being explicit to remeber that Redis stores everything as strings
+    if user_id not in user_ws:
+        user_ws[user_id] = ws
     #if timeline_id not in connections:
 
         #connections[timeline_id] = []
     #connections[timeline_id].append(ws)
     #log_connections()
+    for user in global_connections.hgetall(timeline_id):
+        print(user,"is in timeline",timeline_id,flush=True)
 
     try:
         while True:
             print("sup twin",flush=True)
             dump = await ws.receive_text()
             dumpData = json.loads(dump)
-
-
             db_accurate_dump = await run_in_threadpool(service.ws_update_pair,timeline_id, dumpData,user_id) #We use run_in_threadpool here so that we can pass of the sync work of update_pair to another thread.
             #This ensures that the event loop is not blocked while sync work is happening in the threadpool thread.
-            for user in global_connections.hgetall("timeline_id"):
-                await user_ws[user].send_text(json.dump({
+ 
+            for user in global_connections.hgetall(str(timeline_id)):
+                print(user_ws.items(),flush=True) 
+                await user_ws[int(user)].send_text(json.dumps({
                     "id":db_accurate_dump.id,
                     "user_id":db_accurate_dump.user_id,
                     "dump":db_accurate_dump.text,
@@ -135,8 +139,10 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
                 #}))
     except Exception as e:
         print("WS ERROR:", type(e), e, flush=True)
-        global_connections.hdel(timeline_id,user_id)
-        del user_ws[user_id]
+        global_connections.hdel(str(timeline_id),str(user_id))
+
+        del user_ws[int(user_id)]
+        
         #connections[timeline_id].remove(ws)
         #if connections[timeline_id] == []:
             #del connections[timeline_id]
