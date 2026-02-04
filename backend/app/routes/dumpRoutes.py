@@ -14,6 +14,7 @@ from app.celery_app import celery_app
 from app.security.auth import get_current_user,decode_token
 from starlette.concurrency import run_in_threadpool
 import json
+import redis
 
 router = APIRouter(prefix = "/dump",tags=["Dump Routes"])
 
@@ -77,6 +78,16 @@ def log_connections():
 connections = {}#TO DO: Need to switch this to redis - currently this assumes that all websocket requests get sent to the same worker as connections is local to one worker instance. Need a global
 #way to store connections so all workers can view - use redis
 
+
+global_connections = redis.Redis( #Redis db holding mapping timeline_id -> user_ids
+    host="redis",
+    port=6379,
+    db=3,
+    decode_responses=True  # returns strings instead of bytes
+)
+
+user_ws = {} #local storage mapping users -> their websocket. This is neccseary because redis only stores strings which means we cannot store the actual websocket objects in the redis db. Instead we just store the user_ids and 
+#access the corresponding websocket object from this local dictionary for whatever user we need. 
 @router.websocket("/ws/pair/{timeline_id}")
 async def timeline_ws(ws: WebSocket, timeline_id: str):
     token = ws.query_params.get("token")
@@ -87,12 +98,14 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
         await ws.close(code=1008)
         return
     await ws.accept()
+    
+    global_connections.hset(timeline_id,mapping={user_id:1})
+    user_ws[user_id] = ws
+    #if timeline_id not in connections:
 
-    if timeline_id not in connections:
-
-        connections[timeline_id] = []
-    connections[timeline_id].append(ws)
-    log_connections()
+        #connections[timeline_id] = []
+    #connections[timeline_id].append(ws)
+    #log_connections()
 
     try:
         while True:
@@ -103,21 +116,32 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
 
             db_accurate_dump = await run_in_threadpool(service.ws_update_pair,timeline_id, dumpData,user_id) #We use run_in_threadpool here so that we can pass of the sync work of update_pair to another thread.
             #This ensures that the event loop is not blocked while sync work is happening in the threadpool thread.
-            for conn in connections[timeline_id]:
-                await conn.send_text(json.dump({
+            for user in global_connections.hgetall("timeline_id"):
+                await user_ws[user].send_text(json.dump({
                     "id":db_accurate_dump.id,
                     "user_id":db_accurate_dump.user_id,
                     "dump":db_accurate_dump.text,
                     "created_at":dumpData["created_at"]
 
                 }))
+            
+            #for conn in connections[timeline_id]:
+             #   await conn.send_text(json.dump({
+              #      "id":db_accurate_dump.id,
+               #     "user_id":db_accurate_dump.user_id,
+                #    "dump":db_accurate_dump.text,
+                 #   "created_at":dumpData["created_at"]
+
+                #}))
     except Exception as e:
         print("WS ERROR:", type(e), e, flush=True)
-        connections[timeline_id].remove(ws)
-        if connections[timeline_id] == []:
-            del connections[timeline_id]
+        global_connections.hdel(timeline_id,user_id)
+        del user_ws[user_id]
+        #connections[timeline_id].remove(ws)
+        #if connections[timeline_id] == []:
+            #del connections[timeline_id]
  
-        log_connections()
+        #log_connections()
 
 
 
