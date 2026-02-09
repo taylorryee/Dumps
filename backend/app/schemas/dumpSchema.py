@@ -28,3 +28,8 @@ class dumpProfile(BaseModel):
 
     class Config:
         from_attributes=True
+
+class paginatedData(BaseModel):
+    dumps:List[dumpReturn]
+    moreData:bool
+    cursor:int

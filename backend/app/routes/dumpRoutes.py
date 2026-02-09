@@ -4,7 +4,7 @@ from datetime import date
 from typing import List
 
 from app.db import get_db,SessionLocal
-from app.schemas.dumpSchema import dumpCreate,dumpReturn
+from app.schemas.dumpSchema import dumpCreate,dumpReturn,paginatedData
 from app.schemas.thoughtSchema import thoughtCreate,thoughtReturn
 from app.schemas.categorySchema import categoryCreate,categoryReturn
 
@@ -15,6 +15,7 @@ from app.security.auth import get_current_user,decode_token
 from starlette.concurrency import run_in_threadpool
 import json
 import redis
+from pydantic import BaseModel
 
 router = APIRouter(prefix = "/dump",tags=["Dump Routes"])
 
@@ -26,6 +27,7 @@ def create_dump_route(new_dump:dumpCreate,user=Depends(get_current_user),db:Sess
     if not dump:
         raise HTTPException(status_code=404)
     return dump
+
 
 
 @router.get("/",response_model=List[dumpReturn])
@@ -148,6 +150,13 @@ async def timeline_ws(ws: WebSocket, timeline_id: str):
             #del connections[timeline_id]
  
         #log_connections()
+
+
+
+@router.get("/paginated",response_model=paginatedData)
+def paginatedDumps(limit:int,cursor:int|None=None, user=Depends(get_current_user),db:Session=Depends(get_db)):
+    dumps = service.paginatedDumps(limit,cursor,user,db)
+    return dumps
 
 
 

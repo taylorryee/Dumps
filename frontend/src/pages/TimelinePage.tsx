@@ -1,7 +1,7 @@
 import DumpCard from "../components/DumpCard"
 import styles from "./TimelinePage.module.css"
 import api from "../api"
-import {useState,useEffect} from "react"
+import {useState,useEffect,useRef} from "react"
 import DumpCardInput from "../components/DumpCardInput"
 import Button from "../components/Button"
 
@@ -17,11 +17,18 @@ type Dump = {
 
 function TimelinePage(){
 
-//************************************** STATE ******************************************************************** */
+//************************************** STATE + REF ******************************************************************** */
     const [dumps,setDumps] = useState<Dump[]>([])
     const [text,setText] = useState("")
+    
+    const [cursor,setCursor]=useState<null | number>(null)
+    const [loading,setLoading]=useState(false)
+    const [moreData,setMoreData]=useState(true)
 
-//*************************************** BACKGROUND COLOR **************************************************** */
+    const endTimelineRef = useRef<HTMLDivElement>(null)
+    const timelineRef = useRef<HTMLDivElement>(null)
+
+/*************************************** BACKGROUND COLOR **************************************************** */
     const colors = ["#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99"]; // example palette
     const getColorForDate = (date: string) => {
         const hash = date.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -33,7 +40,7 @@ function TimelinePage(){
             ...dump,
             color: getColorForDate(new Date(dump.created_at).toLocaleDateString())
         }));
-        setDumps(coloredDumps)
+        return coloredDumps
     }
 
     //*********************************** API CALLS ************************************************************* */
@@ -41,7 +48,9 @@ function TimelinePage(){
         try{
             const response = await api.get("/dump/all")
             //setDumps(response.data)
-            assignColors(response.data)
+            const coloredDumps = assignColors(response.data)
+            setDumps(coloredDumps)
+
 
         
         }catch (err:any){
@@ -66,12 +75,56 @@ function TimelinePage(){
             console.error(err.response?.data?.detail);
         }
     }
+
+
+
+
+
+    const loadMore = async () => {
+        try{
+
+            if(!moreData || loading)return;
+            
+            const params = cursor ? {limit:10,cursor} : {limit:10}
+            setLoading(true)
+            const response = await api.get("/dump/paginated",{params})
+            const coloredDumps=assignColors(response.data.dumps)
+            setDumps((prev)=>{return[...prev,...coloredDumps]})
+            setCursor(response.data.cursor)
+            setMoreData(response.data.moreData)
+            setLoading(false)
+
+
+        }catch(err:any){
+            console.error(err)
+        }
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //useEffect(()=>{getDumps()},[])
+    //useEffect(()=>{console.log(loading,"loading rn")},[loading])
+    useEffect(() => {
+        if (!moreData) return;
+
+        const observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                loadMore();
+            }},
+            {rootMargin: "0px 200px 0px 0px" } // load early
+        );
+
+        if (endTimelineRef.current) {
+            observer.observe(endTimelineRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [moreData, cursor]);
+
+
+    useEffect(()=>{console.log(dumps,cursor,moreData,"dumps, cursor and moreData flag")},[cursor])
     
-    useEffect(()=>{getDumps()},[])
-
     return(
-
-            <div className ={styles.timelineWrapper}> 
+        <div>
+            <div className ={styles.timelineWrapper} ref={timelineRef}> 
  
                 <div className={styles.timelineCardSpacer} style = {{backgroundColor:"#358792",height:"100vh"}}/> 
 
@@ -100,10 +153,15 @@ function TimelinePage(){
                         </div>
                     ))}
                 </div>
+                
+                <div ref={endTimelineRef}/>
 
-   
-            
+
             </div>
+
+
+
+        </div>
     );
 }
 

@@ -4,11 +4,13 @@ from sqlalchemy import func
 from datetime import date
 
 from app.models.models import Dump, Thought,Category,User,DailyPair
-from app.schemas.dumpSchema import dumpCreate,dumpReturn
+from app.schemas.dumpSchema import dumpCreate,dumpReturn,paginatedData
 from app.worker.tasks import process_dump
 from app.db import SessionLocal
 
 from sqlalchemy.orm import Session
+
+
 
 
 def create_dump(new_dump:dumpCreate,user:User,db:Session):
@@ -75,6 +77,30 @@ def ws_update_pair(timeline_id:int,dumpData:Dump,user_id:int):
         raise
     finally:
         db.close()
+
+
+def paginatedDumps(limit:int,cursor:int|None,user:User,db:Session):
+    if cursor == None:
+        dumps = db.query(Dump).order_by(Dump.id).filter(Dump.user_id==user.id).limit(limit+1).all()
+    else:
+        dumps = db.query(Dump).order_by(Dump.id).filter(Dump.user_id==user.id,Dump.id>cursor).limit(limit+1).all()
+    
+    if dumps:
+        if len(dumps)>limit:
+            moreData = True
+            dumps = dumps[:limit]
+        else:
+            moreData=False
+        if dumps:
+            newCursor = dumps[-1].id
+
+        else:
+            newCursor = None
+        return paginatedData(dumps=dumps,cursor=newCursor,moreData=moreData)
+    
+    else:
+        return paginatedData(dumps=dumps,cursor=None,moreData=False)
+    
 
 
 
