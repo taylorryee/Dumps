@@ -160,4 +160,8 @@ def paginatedDumps(limit:int,cursor:int|None=None, user=Depends(get_current_user
 
 
 
-
+from app.models.models import User
+@router.get("/testUSERROUTES")
+def testbru(user:int,db:Session=Depends(get_db)):
+    user = db.query(User).filter(User.id == user).first()
+    return user.dumps

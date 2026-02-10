@@ -81,10 +81,13 @@ def ws_update_pair(timeline_id:int,dumpData:Dump,user_id:int):
 
 def paginatedDumps(limit:int,cursor:int|None,user:User,db:Session):
     if cursor == None:
-        dumps = db.query(Dump).order_by(Dump.id).filter(Dump.user_id==user.id).limit(limit+1).all()
+        dumps = db.query(Dump).order_by(Dump.id.desc()).filter(Dump.user_id==user.id).limit(limit+1).all()
+
+
     else:
-        dumps = db.query(Dump).order_by(Dump.id).filter(Dump.user_id==user.id,Dump.id>cursor).limit(limit+1).all()
+        dumps = db.query(Dump).order_by(Dump.id.desc()).filter(Dump.user_id==user.id,Dump.id<cursor).limit(limit+1).all()
     
+
     if dumps:
         if len(dumps)>limit:
             moreData = True
@@ -96,9 +99,11 @@ def paginatedDumps(limit:int,cursor:int|None,user:User,db:Session):
 
         else:
             newCursor = None
+        dumps.reverse() #Must reverse after slicing the list. This is because if you reverse before slicing then you will end up leaving out the newest dump. 
         return paginatedData(dumps=dumps,cursor=newCursor,moreData=moreData)
     
     else:
+        dumps.reverse()
         return paginatedData(dumps=dumps,cursor=None,moreData=False)
     
 

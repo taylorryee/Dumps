@@ -68,7 +68,9 @@ function TimelinePage(){
             } 
             
             setDumps((prev)=>{return [...prev,newDump]})
+
             setText("")
+     
 
         }catch(err:any){
             console.error(err.response?.status);
@@ -89,7 +91,8 @@ function TimelinePage(){
             setLoading(true)
             const response = await api.get("/dump/paginated",{params})
             const coloredDumps=assignColors(response.data.dumps)
-            setDumps((prev)=>{return[...prev,...coloredDumps]})
+            console.log(response.data.dumps,"DUMPS")
+            setDumps((prev)=>{return[...coloredDumps,...prev]})
             setCursor(response.data.cursor)
             setMoreData(response.data.moreData)
             setLoading(false)
@@ -103,6 +106,7 @@ function TimelinePage(){
     //useEffect(()=>{getDumps()},[])
     //useEffect(()=>{console.log(loading,"loading rn")},[loading])
     useEffect(() => {
+        console.log("firing baby")
         if (!moreData) return;
 
         const observer = new IntersectionObserver(entries => {
@@ -120,7 +124,8 @@ function TimelinePage(){
     }, [moreData, cursor]);
 
 
-    useEffect(()=>{console.log(dumps,cursor,moreData,"dumps, cursor and moreData flag")},[cursor])
+
+    useEffect(()=>{console.log(cursor,moreData,"cursor,moreData flag")},[cursor,moreData,dumps])
     
     return(
         <div>
